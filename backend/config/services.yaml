@@ -1,0 +1,88 @@
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
+parameters:
+
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+    # makes classes in src/ available to be used as services
+    # this creates a service per class whose id is the fully-qualified class name
+    RestApi\:
+        resource: '../src/RestApi/'
+        exclude:
+            - '../src/RestApi/DependencyInjection/'
+            - '../src/RestApi/Entity/'
+            - '../src/Kernel.php'
+
+    #Common service
+    MySQLAdapters\DBFactory:
+        arguments:
+            $user: '%env(string:DB_USER)%'
+            $password: '%env(string:DB_PASSWORD)%'
+            $dbName: '%env(string:DB_NAME)%'
+            $host: '%env(string:DB_HOST)%'
+            $port: '%env(int:DB_PORT)%'
+
+    MySQLAdapters\Role\Getting:
+        arguments:
+
+
+    MySQLAdapters\ConfirmationCode\Getting:
+        arguments:
+
+    MySQLAdapters\ConfirmationCode\Creating:
+        arguments:
+    
+    MySQLAdapters\ConfirmationCode\Confirming:
+        arguments:
+
+    MySQLAdapters\Account\Creating:
+        arguments:
+
+    SMTPAdapters\Notifying:
+        arguments:
+            $url: '%env(string:SMTP_URL)%'
+            $port: '%env(int:SMTP_PORT)%'
+            $user: '%env(int:SMTP_USER)%'
+            $password: '%env(int:SMTP_PASSWORD)%'
+
+    Core\ConfirmationCode\UseCases\Creating:
+        arguments:
+            $creating_port: '@MySQLAdapters\ConfirmationCode\Creating'
+            $getting_port: '@MySQLAdapters\ConfirmationCode\Getting'
+            $notifying_port: '@SMTPAdapters\Notifying'
+
+    Core\ConfirmationCode\UseCases\Confirming:
+        arguments:
+            $updating_port: '@MySQLAdapters\ConfirmationCode\Confirming'
+            $getting_port: '@MySQLAdapters\ConfirmationCode\Getting'
+
+    Core\Account\UseCases\Creating:
+        arguments:
+            $salt: '%env(string:PASSWORD_SALT)%'
+            $creating_account_port: '@MySQLAdapters\Account\Creating'
+            $getting_confirmation_code_port: '@MySQLAdapters\ConfirmationCode\Getting'
+            $getting_role_port: '@MySQLAdapters\Role\Getting'
+
+    RestApi\Account\Services\Creating:
+        arguments:
+            $creating_use_case: '@Core\Account\UseCases\Creating'
+
+    RestApi\ConfirmationCode\Services\Confirming:
+        arguments:
+            $confirming_use_case: '@Core\ConfirmationCode\UseCases\Confirming'
+
+    RestApi\ConfirmationCode\Services\Creating:
+        arguments:
+            $creating_use_case: '@Core\ConfirmationCode\UseCases\Creating'
+    
+
+
+
+    
