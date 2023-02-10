@@ -4,7 +4,7 @@ namespace MySQLAdapters;
 
 use DB;
 
-class DBFactory 
+class DBFactory
 {
   public function __construct(
     string $user,
@@ -14,13 +14,13 @@ class DBFactory
     int $port
   )
   {
+    DB::$connect_options = array(MYSQLI_OPT_CONNECT_TIMEOUT => 10);
     DB::$user = $user;
     DB::$password = $password;
     DB::$dbName = $dbName;
     DB::$host = $host;
     DB::$port = $port;
     DB::$encoding = 'utf8';
-    DB::$connect_options = array(MYSQLI_OPT_CONNECT_TIMEOUT => 10);
   }
 }
 

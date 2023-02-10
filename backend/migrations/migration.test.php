@@ -1,41 +1,57 @@
-CREATE TABLE users(
+<?php declare(strict_types=1);
+
+use Dotenv\Dotenv;
+
+require '../vendor/autoload.php';
+
+Dotenv::createUnsafeImmutable(__DIR__ . '/../', '.env.test')->load();
+
+DB::$user = $_ENV["DB_USER"];
+DB::$password = $_ENV["DB_PASSWORD"];
+DB::$dbName = $_ENV["DB_NAME"];
+DB::$host = $_ENV["DB_HOST"];
+DB::$port = $_ENV["DB_PORT"];
+DB::$encoding = 'utf8';
+DB::$connect_options = array(MYSQLI_OPT_CONNECT_TIMEOUT => 10);
+
+DB::query("CREATE TABLE users(
   id BINARY(64) not null,
   name varchar(128) not null,
   created date not null,
   email varchar(128) unique not null,
   password varchar(128) not null,
   primary key(id)
-);
+)");
 
-CREATE TABLE accounts(
+DB::query("CREATE TABLE accounts(
   id BINARY(64) not null,
   created date not null,
   email varchar(128) unique not null,
   primary key(id)
-);
+)");
 
-CREATE TABLE confirmation_codes(
+DB::query("CREATE TABLE confirmation_codes(
   id BINARY(64) not null,
   created INT,
   email varchar(128) unique not null,
   code SMALLINT,
   confirmed BOOLEAN,
   primary key(id)
-);
+)");
 
-CREATE TABLE roles(
+DB::query("CREATE TABLE roles(
   id BINARY(64) not null,
   created date not null,
   name varchar(128) unique not null,
   primary key(id)
-);
+)");
 
-INSERT INTO roles (id, name, created) VALUES (UUID(), 'ADMIN', CURDATE());
-INSERT INTO roles (id, name, created) VALUES (UUID(), 'SUPER', CURDATE());
-INSERT INTO roles (id, name, created) VALUES (UUID(), 'USER', CURDATE());
-INSERT INTO roles (id, name, created) VALUES (UUID(), 'OBSERVER', CURDATE());
+DB::query("INSERT INTO roles (id, name, created) VALUES (UUID(), 'ADMIN', CURDATE())");
+DB::query("INSERT INTO roles (id, name, created) VALUES (UUID(), 'SUPER', CURDATE())");
+DB::query("INSERT INTO roles (id, name, created) VALUES (UUID(), 'USER', CURDATE())");
+DB::query("INSERT INTO roles (id, name, created) VALUES (UUID(), 'OBSERVER', CURDATE())");
 
-CREATE TABLE user_role (
+DB::query("CREATE TABLE user_role (
   user_id BINARY(64) unique not null,
 
   role_id BINARY(64) not null,
@@ -48,9 +64,9 @@ CREATE TABLE user_role (
     FOREIGN KEY (role_id) REFERENCES roles (id)
     ON DELETE CASCADE
     ON UPDATE RESTRICT
-);
+)");
 
-CREATE TABLE user_account (
+DB::query("CREATE TABLE user_account (
   user_id BINARY(64) unique not null,
   account_id BINARY(64) not null,
 
@@ -62,4 +78,4 @@ CREATE TABLE user_account (
     FOREIGN KEY (account_id) REFERENCES accounts (id)
     ON DELETE CASCADE
     ON UPDATE RESTRICT
-);
+)");

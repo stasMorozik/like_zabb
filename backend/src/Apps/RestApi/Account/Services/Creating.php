@@ -1,12 +1,12 @@
 <?php declare(strict_types=1);
 
-namespace RestApi\Account\Services;
+namespace Apps\RestApi\Account\Services;
 
 use Core;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Exception;
 
-class Creating 
+class Creating
 {
   private Core\Account\UseCases\Creating $_creating_use_case;
 
@@ -14,7 +14,7 @@ class Creating
     Core\Account\UseCases\Creating $creating_use_case
   )
   {
-    $this->_creating_use_case = $creating_use_case; 
+    $this->_creating_use_case = $creating_use_case;
   }
 
   public function create(

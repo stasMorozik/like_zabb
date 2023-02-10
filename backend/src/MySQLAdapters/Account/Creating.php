@@ -6,9 +6,11 @@ use DB;
 use Core;
 use Exception;
 
-class Creating implements Core\Account\Ports\Changing 
+class Creating implements Core\Account\Ports\Changing
 {
-  public function change(Core\Account\Entity $account, Core\User\Entity $user): Core\Common\Errors\InfraStructure | bool
+  public function change(
+    Core\Account\Entity $account, Core\User\Entity $user
+  ): Core\Common\Errors\InfraStructure | bool
   {
     try {
       DB::startTransaction();

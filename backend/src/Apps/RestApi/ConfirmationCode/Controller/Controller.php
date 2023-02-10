@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace RestApi\ConfirmationCode\Controller;
+namespace Apps\RestApi\ConfirmationCode\Controller;
 
-use RestApi;
+use Apps;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
@@ -12,7 +12,7 @@ class Controller extends AbstractController
 {
   #[Route('/confirmation-code', name: 'create', methods: 'POST')]
   public function create(
-    RestApi\ConfirmationCode\Services\Creating $_creating_service,
+    Apps\RestApi\ConfirmationCode\Services\Creating $_creating_service,
     Request $request
   ): JsonResponse
   {

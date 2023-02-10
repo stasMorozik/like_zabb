@@ -6,12 +6,14 @@ use DB;
 use Core;
 use MySQLAdapters;
 
-class Getting implements Core\ConfirmationCode\Ports\Getting 
+class Getting implements Core\ConfirmationCode\Ports\Getting
 {
-  public function get(Core\Common\ValueObjects\Email $email): Core\Common\Errors\InfraStructure | Core\ConfirmationCode\Entity
+  public function get(
+    Core\Common\ValueObjects\Email $email
+  ): Core\Common\Errors\InfraStructure | Core\ConfirmationCode\Entity
   {
     $code = DB::queryFirstRow("SELECT * FROM confirmation_codes WHERE email=%s", $email->getValue());
-    
+
     if (!$code) {
       return new Core\Common\Errors\InfraStructure('Confirmation code not found');
     }

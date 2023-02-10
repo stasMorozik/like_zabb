@@ -1,30 +1,31 @@
 <?php declare(strict_types=1);
 
-namespace RestApi\ConfirmationCode\Services;
+namespace Apps\RestApi\ConfirmationCode\Services;
 
 use Core;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Exception;
 
-class Creating 
+class Confirming
 {
-  private Core\ConfirmationCode\UseCases\Creating $_creating_use_case;
+  private Core\ConfirmationCode\UseCases\Confirming $_confirming_use_case;
 
   public function __construct(
-    Core\ConfirmationCode\UseCases\Creating $creating_use_case
+    Core\ConfirmationCode\UseCases\Confirming $confirming_use_case
   )
   {
-    $this->_creating_use_case = $creating_use_case; 
+    $this->_confirming_use_case = $confirming_use_case;
   }
 
-  public function create(
-    ?string $email
+  public function confirm(
+    ?string $email,
+    ?int $code
   ): JsonResponse
   {
     $resp = new JsonResponse();
 
     try {
-      $result = $this->_creating_use_case->create($email);
+      $result = $this->_confirming_use_case->confirm($email, $code);
 
       if ($result !== true) {
         return $resp->setStatusCode(400)->setData(["message" => $result->getMessage()]);

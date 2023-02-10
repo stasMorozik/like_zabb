@@ -38,7 +38,7 @@ services:
 
     MySQLAdapters\ConfirmationCode\Creating:
         arguments:
-    
+
     MySQLAdapters\ConfirmationCode\Confirming:
         arguments:
 
@@ -70,19 +70,19 @@ services:
             $getting_confirmation_code_port: '@MySQLAdapters\ConfirmationCode\Getting'
             $getting_role_port: '@MySQLAdapters\Role\Getting'
 
-    RestApi\Account\Services\Creating:
+    Apps\RestApi\Account\Services\Creating:
         arguments:
             $creating_use_case: '@Core\Account\UseCases\Creating'
 
-    RestApi\ConfirmationCode\Services\Confirming:
+    Apps\RestApi\ConfirmationCode\Services\Confirming:
         arguments:
             $confirming_use_case: '@Core\ConfirmationCode\UseCases\Confirming'
 
-    RestApi\ConfirmationCode\Services\Creating:
+    Apps\RestApi\ConfirmationCode\Services\Creating:
         arguments:
             $creating_use_case: '@Core\ConfirmationCode\UseCases\Creating'
-    
 
 
 
-    
+
+
