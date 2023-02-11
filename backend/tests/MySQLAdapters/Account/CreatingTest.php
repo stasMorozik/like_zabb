@@ -21,7 +21,7 @@ class CreatingTest extends TestCase
     DB::query("DELETE FROM user_role");
     DB::query("DELETE FROM user_account");
     DB::query("DELETE FROM accounts");
-    DB::query("DELETE FROM users");
+    DB::query("DELETE FROM users WHERE email = %s", self::$email);
   }
 
   public static function setUpBeforeClass(): void

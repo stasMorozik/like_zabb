@@ -10,11 +10,11 @@ use Tests;
 use Core;
 use MySQLAdapters;
 
-class GettingTest extends TestCase
+class GettingByIdTest extends TestCase
 {
   protected static $db;
   protected static $getting_user_adapter;
-  protected static $email = 'name3@gmail.com';
+  protected static $email = 'name2@gmail.com';
   protected static $password = '12345';
   protected static $name = 'Joe';
   protected static $id;
@@ -50,17 +50,14 @@ class GettingTest extends TestCase
   public static function setUpBeforeClass(): void
   {
     self::$db = Tests\MySQLAdapters\DBFactory::factory();
-    self::$getting_user_adapter = new MySQLAdapters\User\Getting();
+    self::$getting_user_adapter = new MySQLAdapters\User\GettingById();
     self::$id = Uuid::uuid4()->toString();
   }
 
   public function testGet(): void
   {
-
     $maybe_user = self::$getting_user_adapter->get(
-      new MySQLAdapters\Common\Mappers\ValueObjects\Email(
-        self::$email
-      )
+      self::$id
     );
 
     $this->assertInstanceOf(
@@ -72,9 +69,7 @@ class GettingTest extends TestCase
   public function testNotFound(): void
   {
     $maybe_user = self::$getting_user_adapter->get(
-      new MySQLAdapters\Common\Mappers\ValueObjects\Email(
-        'name1@gmail.com'
-      )
+      Uuid::uuid4()->toString()
     );
 
     $this->assertInstanceOf(

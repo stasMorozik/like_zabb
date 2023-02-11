@@ -46,14 +46,19 @@ class Entity
       $payload = JWT::decode($access_token, new Key($access_token_salt, 'HS256'));
       return $payload->{'iss'};
     } catch(InvalidArgumentException $e) {
+      //Some custom message
       return new Core\Common\Errors\Domain('Invalid token');
     } catch (DomainException $e) {
+      //Some custom message
       return new Core\Common\Errors\Domain('Invalid token');
     } catch (SignatureInvalidException $e) {
+      //Some custom message
       return new Core\Common\Errors\Domain('Invalid token');
     } catch (ExpiredException $e) {
+      //Some custom message
       return new Core\Common\Errors\Domain('Invalid token');
     } catch (UnexpectedValueException $e) {
+      //Some custom message
       return new Core\Common\Errors\Domain('Invalid token');
     }
   }
@@ -68,14 +73,19 @@ class Entity
         $payload->{'iss'}
       );
     } catch(InvalidArgumentException $e) {
+      //Some custom message
       return new Core\Common\Errors\Domain('Invalid token');
     } catch (DomainException $e) {
+      //Some custom message
       return new Core\Common\Errors\Domain('Invalid token');
     } catch (SignatureInvalidException $e) {
+      //Some custom message
       return new Core\Common\Errors\Domain('Invalid token');
     } catch (ExpiredException $e) {
+      //Some custom message
       return new Core\Common\Errors\Domain('Invalid token');
     } catch (UnexpectedValueException $e) {
+      //Some custom message
       return new Core\Common\Errors\Domain('Invalid token');
     }
   }

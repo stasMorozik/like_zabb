@@ -15,7 +15,7 @@ DB::$encoding = 'utf8';
 DB::$connect_options = array(MYSQLI_OPT_CONNECT_TIMEOUT => 10);
 
 DB::query("CREATE TABLE users(
-  id BINARY(64) not null,
+  id BINARY(36) not null,
   name varchar(128) not null,
   created date not null,
   email varchar(128) unique not null,
@@ -24,14 +24,14 @@ DB::query("CREATE TABLE users(
 )");
 
 DB::query("CREATE TABLE accounts(
-  id BINARY(64) not null,
+  id BINARY(36) not null,
   created date not null,
   email varchar(128) unique not null,
   primary key(id)
 )");
 
 DB::query("CREATE TABLE confirmation_codes(
-  id BINARY(64) not null,
+  id BINARY(36) not null,
   created INT,
   email varchar(128) unique not null,
   code SMALLINT,
@@ -40,7 +40,7 @@ DB::query("CREATE TABLE confirmation_codes(
 )");
 
 DB::query("CREATE TABLE roles(
-  id BINARY(64) not null,
+  id BINARY(36) not null,
   created date not null,
   name varchar(128) unique not null,
   primary key(id)
@@ -52,9 +52,9 @@ DB::query("INSERT INTO roles (id, name, created) VALUES (UUID(), 'USER', CURDATE
 DB::query("INSERT INTO roles (id, name, created) VALUES (UUID(), 'OBSERVER', CURDATE())");
 
 DB::query("CREATE TABLE user_role (
-  user_id BINARY(64) unique not null,
+  user_id BINARY(36) unique not null,
 
-  role_id BINARY(64) not null,
+  role_id BINARY(36) not null,
 
   CONSTRAINT `fk_user_role_user_id`
     FOREIGN KEY (user_id) REFERENCES users (id)
@@ -67,8 +67,8 @@ DB::query("CREATE TABLE user_role (
 )");
 
 DB::query("CREATE TABLE user_account (
-  user_id BINARY(64) unique not null,
-  account_id BINARY(64) not null,
+  user_id BINARY(36) unique not null,
+  account_id BINARY(36) not null,
 
   CONSTRAINT `fk_user_account_user_id`
     FOREIGN KEY (user_id) REFERENCES users (id)

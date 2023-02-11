@@ -30,7 +30,10 @@ class Authentication
     $this->_getting_port = $getting_port;
   }
 
-  public function auth(?string $email, ?string $password): Core\Common\Errors\Domain | Core\Common\Errors\InfraStructure | Core\Session\Entity
+  public function auth(
+    ?string $email,
+    ?string $password
+  ): Core\Common\Errors\Domain | Core\Common\Errors\InfraStructure | Core\Session\Entity
   {
     $maybe_email = Core\Common\ValueObjects\Email::new($email);
 

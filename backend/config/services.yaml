@@ -13,12 +13,12 @@ services:
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
-    RestApi\:
-        resource: '../src/RestApi/'
+    Apps\RestApi\:
+        resource: '../src/Apps/RestApi/'
         exclude:
-            - '../src/RestApi/DependencyInjection/'
-            - '../src/RestApi/Entity/'
-            - '../src/Kernel.php'
+            - '../src/Apps/RestApi/DependencyInjection/'
+            - '../src/Apps/RestApi/Entity/'
+            - '../src/Apps/Kernel.php'
 
     #Common service
     MySQLAdapters\DBFactory:
@@ -46,6 +46,9 @@ services:
         arguments:
 
     MySQLAdapters\User\Getting:
+        arguments:
+
+    MySQLAdapters\User\GettingById:
         arguments:
 
     SMTPAdapters\Notifying:
@@ -85,6 +88,11 @@ services:
             $access_token_salt: '%env(string:ACCESS_TOKEN_SALT)%'
             $refresh_token_salt: '%env(string:REFRESH_TOKEN_SALT)%'
 
+    Core\User\UseCases\Authorization:
+        arguments:
+            $access_token_salt: '%env(string:ACCESS_TOKEN_SALT)%'
+            $getting_port: '@MySQLAdapters\User\GettingById'
+
     Apps\RestApi\Account\Services\Creating:
         arguments:
             $creating_use_case: '@Core\Account\UseCases\Creating'
@@ -104,6 +112,10 @@ services:
     Apps\RestApi\Session\Services\Refreshing:
         arguments:
             $refreshing_use_case: '@Core\Session\UseCases\Refreshing'
+
+    Apps\RestApi\User\Services\Authorization:
+        arguments:
+            $authorization_use_case: '@Core\User\UseCases\Authorization'
 
 
 

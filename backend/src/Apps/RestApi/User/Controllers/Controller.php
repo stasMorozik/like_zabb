@@ -23,4 +23,17 @@ class Controller extends AbstractController
       $params->{'email'}, $params->{'password'}
     );
   }
+
+  #[Route('/user', name: 'authorization', methods: 'GET')]
+  public function authorization(
+    Apps\RestApi\User\Services\Authorization $_authorization_service,
+    Request $request
+  ): JsonResponse
+  {
+    $params = json_decode($request->getContent());
+
+    return $_authorization_service->auth(
+      isset($_SESSION["access_token"]) ? $_SESSION["access_token"] : ''
+    );
+  }
 }

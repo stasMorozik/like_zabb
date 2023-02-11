@@ -5,7 +5,7 @@ build_db_test:
   docker run --rm --name db_zabb_test -v /projects/mysql-test/:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=12345 -e MYSQL_PASSWORD=12345 -e MYSQL_USER=db_user -e MYSQL_DATABASE=zabb -e MYSQL_TCP_PORT=3307 -p 3307:3306 -d mysql:debian
 
 build_db_migration:
-  docker build -f Dockerfile.migration ./  -t db_migration
+  docker build -f Dockerfile.migration ./ -t db_migration
 
 run_db_migration:
   docker run --rm --name db_migration -v /projects/like_zabb/backend:/db_migration db_migration

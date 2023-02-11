@@ -27,7 +27,8 @@ class Controller extends AbstractController
     Request $request
   ): JsonResponse
   {
-    unset($_SESSION["newsession"]);
+    unset($_SESSION["refresh_token"]);
+    unset($_SESSION["access_token"]);
 
     $resp = new JsonResponse();
 
