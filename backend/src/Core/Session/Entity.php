@@ -40,7 +40,7 @@ class Entity
     $this->refresh_token = JWT::encode($payload, $refresh_token_salt, 'HS256');
   }
 
-  public static function decode($access_token_salt, $access_token): Core\Common\Errors\Domain | string
+  public static function decode(string $access_token_salt, ?string $access_token): Core\Common\Errors\Domain | string
   {
     try {
       $payload = JWT::decode($access_token, new Key($access_token_salt, 'HS256'));
@@ -58,7 +58,7 @@ class Entity
     }
   }
 
-  public static function refresh($access_token_salt, $refresh_token_salt, $refresh_token)
+  public static function refresh(string $access_token_salt, string $refresh_token_salt, ?string $refresh_token)
   {
     try {
       $payload = JWT::decode($refresh_token, new Key($refresh_token_salt, 'HS256'));

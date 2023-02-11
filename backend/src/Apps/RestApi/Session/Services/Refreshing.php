@@ -1,28 +1,28 @@
 <?php declare(strict_types=1);
 
-namespace Apps\RestApi\User\Services;
+namespace Apps\RestApi\Session\Services;
 
 use Core;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Exception;
 
-class Authentication
+class Refreshing
 {
-  private Core\User\UseCases\Authentication $_authentication_use_case;
+  private Core\Session\UseCases\Refreshing $_refreshing_use_case;
 
   public function __construct(
-    Core\User\UseCases\Authentication $authentication_use_case
+    Core\Session\UseCases\Refreshing $refreshing_use_case
   )
   {
-    $this->_authentication_use_case = $authentication_use_case;
+    $this->_refreshing_use_case = $refreshing_use_case;
   }
 
-  public function auth(?string $email, ?string $password)
+  public function auth(?string $refresh_token)
   {
     $resp = new JsonResponse();
 
     try {
-      $result = $this->_authentication_use_case->auth($email, $password);
+      $result = $this->_refreshing_use_case->refresh($refresh_token);
 
       if (($result instanceof Core\Session\Entity) == false) {
         return $resp->setStatusCode(400)->setData(["message" => $result->getMessage()]);
