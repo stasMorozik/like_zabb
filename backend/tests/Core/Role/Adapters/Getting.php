@@ -16,10 +16,10 @@ class Getting implements Core\Role\Ports\Getting
 
   public function get(Core\Role\ValueObjects\Name $name): Core\Common\Errors\InfraStructure | Core\Role\Entity
   {
-    try {
+    if (isset($this->roles[ $name->getValue() ])) {
       return $this->roles[ $name->getValue() ];
-    } catch(Exception $_) {
-      return new Core\Common\Errors\InfraStructure('Role not found');
     }
+
+    return new Core\Common\Errors\InfraStructure('Role not found');
   }
 }

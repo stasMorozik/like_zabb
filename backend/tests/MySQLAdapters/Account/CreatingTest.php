@@ -37,11 +37,11 @@ class CreatingTest extends TestCase
     $code = Core\ConfirmationCode\Entity::new($maybe_email);
     $account = Core\Account\Entity::new($code);
     $role = self::$getting_role_adapter->get(
-      new MySQLAdapters\Role\Mappers\ValueObjects\MapperName(
+      new MySQLAdapters\Role\Mappers\ValueObjects\Name(
         Core\Role\ValueObjects\Name::ADMIN
       )
     );
-    $user = Core\User\Entity::new($account, $role, self::$salt, 'Joe', '12345'); 
+    $user = Core\User\Entity::new($account, $role, self::$salt, 'Joe', '12345');
 
     $maybe_true = self::$creating_account_adapter->change(
       $account,
@@ -60,11 +60,11 @@ class CreatingTest extends TestCase
     $code = Core\ConfirmationCode\Entity::new($maybe_email);
     $account = Core\Account\Entity::new($code);
     $role = self::$getting_role_adapter->get(
-      new MySQLAdapters\Role\Mappers\ValueObjects\MapperName(
+      new MySQLAdapters\Role\Mappers\ValueObjects\Name(
         Core\Role\ValueObjects\Name::ADMIN
       )
     );
-    $user = Core\User\Entity::new($account, $role, self::$salt, 'Joe', '12345'); 
+    $user = Core\User\Entity::new($account, $role, self::$salt, 'Joe', '12345');
 
     $maybe_true = self::$creating_account_adapter->change(
       $account,

@@ -45,6 +45,9 @@ services:
     MySQLAdapters\Account\Creating:
         arguments:
 
+    MySQLAdapters\User\Getting:
+        arguments:
+
     SMTPAdapters\Notifying:
         arguments:
             $url: '%env(string:SMTP_URL)%'
@@ -70,6 +73,13 @@ services:
             $getting_confirmation_code_port: '@MySQLAdapters\ConfirmationCode\Getting'
             $getting_role_port: '@MySQLAdapters\Role\Getting'
 
+    Core\User\UseCases\Authentication:
+        arguments:
+            $password_salt: '%env(string:PASSWORD_SALT)%'
+            $access_token_salt: '%env(string:ACCESS_TOKEN_SALT)%'
+            $refresh_token_salt: '%env(string:REFRESH_TOKEN_SALT)%'
+            $getting_port: '@MySQLAdapters\User\Getting'
+
     Apps\RestApi\Account\Services\Creating:
         arguments:
             $creating_use_case: '@Core\Account\UseCases\Creating'
@@ -82,6 +92,9 @@ services:
         arguments:
             $creating_use_case: '@Core\ConfirmationCode\UseCases\Creating'
 
+    Apps\RestApi\User\Services\Authentication:
+        arguments:
+            $authentication_use_case: '@Core\User\UseCases\Authentication'
 
 
 

@@ -12,7 +12,7 @@ use Core;
 
 interface Getting
 {
-  public function change(
+  public function get(
     Core\Common\ValueObjects\Email $email
   ): Core\Common\Errors\InfraStructure | Core\User\Entity;
 }

@@ -18,7 +18,7 @@ class Getting implements Core\ConfirmationCode\Ports\Getting
       return new Core\Common\Errors\InfraStructure('Confirmation code not found');
     }
 
-    return new MySQLAdapters\ConfirmationCode\Mappers\MapperEntity(
+    return new MySQLAdapters\ConfirmationCode\Mappers\Entity(
       $code['id'],
       new MySQLAdapters\Common\Mappers\ValueObjects\Email($code['email']),
       (int) $code['created'],

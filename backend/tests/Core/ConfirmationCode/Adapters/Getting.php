@@ -16,10 +16,10 @@ class Getting implements Core\ConfirmationCode\Ports\Getting
 
   public function get(Core\Common\ValueObjects\Email $email): Core\Common\Errors\InfraStructure | Core\ConfirmationCode\Entity
   {
-    try {
+    if (isset($this->codes[ $email->getValue() ])) {
       return $this->codes[ $email->getValue() ];
-    } catch(Exception $_) {
-      return new Core\Common\Errors\InfraStructure('Code not found');
     }
+
+    return new Core\Common\Errors\InfraStructure('Code not found');
   }
 }

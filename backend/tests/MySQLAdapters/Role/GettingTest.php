@@ -21,11 +21,11 @@ class GettingTest extends TestCase
   public function testGet(): void
   {
     $maybe_role = self::$getting_role_adapter->get(
-      new MySQLAdapters\Role\Mappers\ValueObjects\MapperName(
+      new MySQLAdapters\Role\Mappers\ValueObjects\Name(
         Core\Role\ValueObjects\Name::ADMIN
       )
     );
-    
+
     $this->assertInstanceOf(
       Core\Role\Entity::class,
       $maybe_role
@@ -35,11 +35,11 @@ class GettingTest extends TestCase
   public function testNotFound(): void
   {
     $maybe_role = self::$getting_role_adapter->get(
-      new MySQLAdapters\Role\Mappers\ValueObjects\MapperName(
+      new MySQLAdapters\Role\Mappers\ValueObjects\Name(
         'TEST'
       )
     );
-    
+
     $this->assertInstanceOf(
       Core\Common\Errors\InfraStructure::class,
       $maybe_role

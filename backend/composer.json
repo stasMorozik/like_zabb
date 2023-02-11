@@ -13,6 +13,7 @@
       "Tests\\Core\\ConfirmationCode\\Adapters\\": "tests/Core/ConfirmationCode/Adapters",
       "Tests\\Core\\Account\\Adapters\\": "tests/Core/Account/Adapters",
       "Tests\\Core\\Role\\Adapters\\": "tests/Core/Role/Adapters",
+      "Tests\\Core\\User\\Adapters\\": "tests/Core/User/Adapters",
       "Tests\\MySQLAdapters\\": "tests/MySQLAdapters"
     }
   },
@@ -34,8 +35,10 @@
     "symfony/framework-bundle": "6.1.*",
     "symfony/runtime": "6.1.*",
     "symfony/yaml": "6.1.*",
+    "symfony/http-foundation": "^6.2.6",
     "sergeytsalkov/meekrodb": "^2.4",
-    "vlucas/phpdotenv": "^5.5.0"
+    "vlucas/phpdotenv": "^5.5.0",
+    "firebase/php-jwt": "^6.4.0"
   },
   "require-dev": {
     "phpunit/phpunit": "^9.5",

@@ -4,7 +4,7 @@ namespace MySQLAdapters\ConfirmationCode\Mappers;
 
 use Core;
 
-class MapperEntity extends Core\ConfirmationCode\Entity 
+class Entity extends Core\ConfirmationCode\Entity
 {
   public function __construct(
     string $id,

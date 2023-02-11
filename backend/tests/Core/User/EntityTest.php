@@ -5,7 +5,7 @@ namespace Tests\Core\User;
 use PHPUnit\Framework\TestCase;
 use Core;
 
-class EntityTest extends TestCase 
+class EntityTest extends TestCase
 {
   protected static $email = 'name@gmail.com';
   protected static $salt = 'some_secret';
@@ -16,7 +16,7 @@ class EntityTest extends TestCase
     $code = Core\ConfirmationCode\Entity::new($maybe_email);
     $account = Core\Account\Entity::new($code);
     $role = Core\Role\Entity::new(Core\Role\ValueObjects\Name::ADMIN);
-    $user = Core\User\Entity::new($account, $role, self::$salt, 'Joe', '12345'); 
+    $user = Core\User\Entity::new($account, $role, self::$salt, 'Joe', '12345');
 
     $this->assertInstanceOf(
       Core\User\Entity::class,
@@ -30,7 +30,7 @@ class EntityTest extends TestCase
     $code = Core\ConfirmationCode\Entity::new($maybe_email);
     $account = Core\Account\Entity::new($code);
     $role = Core\Role\Entity::new(Core\Role\ValueObjects\Name::ADMIN);
-    $user = Core\User\Entity::new($account, $role, self::$salt, 'Joe12', '12345'); 
+    $user = Core\User\Entity::new($account, $role, self::$salt, 'Joe12', '12345');
 
     $this->assertInstanceOf(
       Core\Common\Errors\Domain::class,

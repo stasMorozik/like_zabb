@@ -4,7 +4,7 @@ namespace MySQLAdapters\Role\Mappers\ValueObjects;
 
 use Core;
 
-class MapperName extends Core\Role\ValueObjects\Name 
+class Name extends Core\Role\ValueObjects\Name
 {
   public function __construct(
     string $name

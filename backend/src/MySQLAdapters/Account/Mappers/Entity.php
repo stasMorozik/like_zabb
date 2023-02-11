@@ -5,7 +5,7 @@ namespace MySQLAdapters\Account\Mappers;
 use DateTime;
 use Core;
 
-class MapperEntity extends Core\Account\Entity 
+class Entity extends Core\Account\Entity
 {
   public function __construct(
     string $id,

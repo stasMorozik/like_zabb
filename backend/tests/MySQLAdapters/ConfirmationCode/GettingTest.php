@@ -32,12 +32,12 @@ class GettingTest extends TestCase
     $maybe_email = Core\Common\ValueObjects\Email::new(self::$email);
     $code = Core\ConfirmationCode\Entity::new($maybe_email);
     $maybe_true = self::$creating_code_adapter->change($code);
-    
+
     if ($maybe_true === true) {
       $maybe_code = self::$getting_code_adapter->get(
         new MySQLAdapters\Common\Mappers\ValueObjects\Email(self::$email)
       );
-      
+
       $this->assertInstanceOf(
         Core\ConfirmationCode\Entity::class,
         $maybe_code
@@ -50,7 +50,7 @@ class GettingTest extends TestCase
     $maybe_code = self::$getting_code_adapter->get(
       new MySQLAdapters\Common\Mappers\ValueObjects\Email(self::$email)
     );
-    
+
     $this->assertInstanceOf(
       Core\Common\Errors\InfraStructure::class,
       $maybe_code
