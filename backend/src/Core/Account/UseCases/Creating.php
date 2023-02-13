@@ -7,10 +7,10 @@ use Core;
 /**
  *
  * Creating Use Case
- *  
+ *
 **/
 
-class Creating 
+class Creating
 {
   private string $_salt;
   private Core\Account\Ports\Changing $_creating_account_port;
@@ -37,8 +37,8 @@ class Creating
   ): Core\Common\Errors\Domain | Core\Common\Errors\InfraStructure | bool
   {
 
-    $maybe_role = $this->_getting_role_port->get(Core\Role\ValueObjects\Name::new(Core\Role\ValueObjects\Name::ADMIN));
-    
+    $maybe_role = $this->_getting_role_port->get(Core\Role\ValueObjects\Name::new(Core\Role\ValueObjects\Name::SUPER));
+
     if ($maybe_role instanceof Core\Common\Errors\InfraStructure) {
       return $maybe_role;
     }
@@ -75,7 +75,7 @@ class Creating
     if ($maybe_user instanceof Core\Common\Errors\Domain) {
       return $maybe_user;
     }
-    
+
     return $this->_creating_account_port->change(
       $account,
       $maybe_user

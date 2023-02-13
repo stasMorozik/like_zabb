@@ -7,7 +7,7 @@ use Core;
 /**
  *
  * Value Object of Name, only for Entity Role
- *  
+ *
 **/
 
 class Name extends Core\Common\ValueObjects\Common
@@ -29,9 +29,7 @@ class Name extends Core\Common\ValueObjects\Common
       self::ADMIN => new Name($name),
       self::USER => new Name($name),
       self::OBSERVER => new Name($name),
-      default => new Core\Common\Errors\Domain('Invalid measure')
-    }; 
-    
-    return new Name($name);   
+      default => new Core\Common\Errors\Domain('Invalid role')
+    };
   }
 }

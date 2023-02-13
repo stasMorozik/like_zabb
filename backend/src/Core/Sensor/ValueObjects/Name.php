@@ -1,18 +1,18 @@
 <?php declare(strict_types=1);
 
-namespace Core\Common\ValueObjects;
+namespace Core\Sensor\ValueObjects;
 
 use Core;
 
 /**
  *
- * Value Object of Name, for user or something alike
+ * Value Object of Name, only for Entity Sensor
  *
 **/
 
 class Name extends Core\Common\ValueObjects\Common
 {
-  protected function __construct(string $name)
+  protected function __construct(?string $name)
   {
     parent::__construct($name);
   }
@@ -31,7 +31,7 @@ class Name extends Core\Common\ValueObjects\Common
       return new Core\Common\Errors\Domain('Invalid name');
     }
 
-    if (preg_match("/\d/", $name)) {
+    if (!preg_match("/^([A-za-z\s]+|\d+)$/i", $name)) {
       return new Core\Common\Errors\Domain('Invalid name');
     }
 

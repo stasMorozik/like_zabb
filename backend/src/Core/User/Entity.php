@@ -9,10 +9,10 @@ use Ramsey\Uuid\Uuid;
 /**
  *
  * Entity User
- *  
+ *
 **/
 
-class Entity 
+class Entity
 {
   protected string $id;
   protected DateTime $created;
@@ -20,6 +20,7 @@ class Entity
   protected Core\Common\ValueObjects\Email $email;
   protected Core\User\ValueObjects\Password $password;
   protected Core\Role\Entity $role;
+  protected Core\Account\Entity $account;
 
   protected function __construct(
     string $id,
@@ -27,7 +28,8 @@ class Entity
     Core\Common\ValueObjects\Name $name,
     Core\Common\ValueObjects\Email $email,
     Core\User\ValueObjects\Password $password,
-    Core\Role\Entity $role
+    Core\Role\Entity $role,
+    Core\Account\Entity $account
   )
   {
     $this->id = $id;
@@ -36,19 +38,20 @@ class Entity
     $this->email = $email;
     $this->password = $password;
     $this->role = $role;
+    $this->account = $account;
   }
 
-  public function getId(): string 
+  public function getId(): string
   {
     return $this->id;
   }
 
-  public function getCreated(): DateTime 
+  public function getCreated(): DateTime
   {
     return $this->created;
   }
 
-  public function getName(): Core\Common\ValueObjects\Name 
+  public function getName(): Core\Common\ValueObjects\Name
   {
     return $this->name;
   }
@@ -71,6 +74,7 @@ class Entity
   public static function new(
     Core\Account\Entity $account,
     Core\Role\Entity $role,
+    Core\Common\ValueObjects\Email $email,
     string $salt,
     ?string $name,
     ?string $password
@@ -90,7 +94,7 @@ class Entity
       Uuid::uuid4()->toString(),
       new DateTime(),
       $maybe_name,
-      $account->getEmail(),
+      $email,
       $maybe_password,
       $role
     );
