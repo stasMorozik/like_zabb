@@ -17,12 +17,15 @@ class GettingTest extends TestCase
   protected static $email = 'name3@gmail.com';
   protected static $password = '12345';
   protected static $name = 'Joe';
-  protected static $id;
+  protected static $id_user;
+  protected static $id_account;
 
   protected function tearDown(): void
   {
-    DB::query("DELETE FROM user_role WHERE user_id = %s", self::$id);
+    DB::query("DELETE FROM user_role WHERE user_id = %s", self::$id_user);
+    DB::query("DELETE FROM user_account WHERE user_id = %s", self::$id_user);
     DB::query("DELETE FROM users WHERE email = %s", self::$email);
+    DB::query("DELETE FROM accounts WHERE email = %s", self::$email);
   }
 
   protected function setUp(): void
@@ -31,16 +34,27 @@ class GettingTest extends TestCase
 
     $role = DB::queryFirstRow("SELECT * FROM roles WHERE name= 'ADMIN'");
 
+    DB::insert('accounts', [
+      'id' => self::$id_account,
+      'email' => self::$email,
+      'created' => new DateTime()
+    ]);
+
     DB::insert('users', [
-      'id' => self::$id,
+      'id' => self::$id_user,
       'email' => self::$email,
       'created' => new DateTime(),
       'name' => self::$name,
       'password' => self::$password
     ]);
 
+    DB::insert('user_account', [
+      'user_id' => self::$id_user,
+      'account_id' => self::$id_account
+    ]);
+
     DB::insert('user_role', [
-      'user_id' => self::$id,
+      'user_id' => self::$id_user,
       'role_id' => $role['id']
     ]);
 
@@ -51,7 +65,8 @@ class GettingTest extends TestCase
   {
     self::$db = Tests\MySQLAdapters\DBFactory::factory();
     self::$getting_user_adapter = new MySQLAdapters\User\Getting();
-    self::$id = Uuid::uuid4()->toString();
+    self::$id_user = Uuid::uuid4()->toString();
+    self::$id_account = Uuid::uuid4()->toString();
   }
 
   public function testGet(): void

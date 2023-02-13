@@ -41,10 +41,9 @@ class CreatingTest extends TestCase
         Core\Role\ValueObjects\Name::ADMIN
       )
     );
-    $user = Core\User\Entity::new($account, $role, self::$salt, 'Joe', '12345');
+    $user = Core\User\Entity::new($account, $role, $maybe_email, self::$salt, 'Joe', '12345');
 
     $maybe_true = self::$creating_account_adapter->change(
-      $account,
       $user
     );
 
@@ -64,15 +63,13 @@ class CreatingTest extends TestCase
         Core\Role\ValueObjects\Name::ADMIN
       )
     );
-    $user = Core\User\Entity::new($account, $role, self::$salt, 'Joe', '12345');
+    $user = Core\User\Entity::new($account, $role, $maybe_email, self::$salt, 'Joe', '12345');
 
     $maybe_true = self::$creating_account_adapter->change(
-      $account,
       $user
     );
 
     $maybe_true = self::$creating_account_adapter->change(
-      $account,
       $user
     );
 

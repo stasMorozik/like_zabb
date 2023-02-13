@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 use Core;
 use Tests;
 
-class CreatingTest extends TestCase 
+class CreatingTest extends TestCase
 {
   protected $codes = [];
   protected $users = [];
@@ -31,13 +31,13 @@ class CreatingTest extends TestCase
     $this->getting_code_adapter = new Tests\Core\ConfirmationCode\Adapters\Getting($this->codes);
     $this->notifying_adapter = new Tests\Core\ConfirmationCode\Adapters\Notifying();
     $this->getting_role_adapter = new Tests\Core\Role\Adapters\Getting($this->roles);
-    
+
     $this->creating_code_use_case = new Core\ConfirmationCode\UseCases\Creating(
       $this->creating_code_adapter,
       $this->getting_code_adapter,
       $this->notifying_adapter
     );
-    
+
     $this->confirming_code_use_case = new Core\ConfirmationCode\UseCases\Confirming(
       $this->creating_code_adapter,
       $this->getting_code_adapter
@@ -50,10 +50,10 @@ class CreatingTest extends TestCase
       $this->codes[$this->email]->getCode()
     );
 
-    $this->roles[Core\Role\ValueObjects\Name::ADMIN] = new Tests\Core\Role\Adapters\Mappers\MapperEntity(
-      Core\Role\ValueObjects\Name::ADMIN
+    $this->roles[Core\Role\ValueObjects\Name::SUPER] = new Tests\Core\Role\Adapters\Mappers\MapperEntity(
+      Core\Role\ValueObjects\Name::SUPER
     );
-    
+
     $this->creating_account_adapter = new Tests\Core\Account\Adapters\Changing($this->accounts, $this->users);
 
     $this->creating_account_use_case = new Core\Account\UseCases\Creating(

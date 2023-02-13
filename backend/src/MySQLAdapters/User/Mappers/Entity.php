@@ -14,9 +14,10 @@ class Entity extends Core\User\Entity
     MySQLAdapters\Common\Mappers\ValueObjects\Name $name,
     MySQLAdapters\Common\Mappers\ValueObjects\Email $email,
     MySQLAdapters\User\Mappers\ValueObjects\Password $password,
-    MySQLAdapters\Role\Mappers\Entity $role
+    MySQLAdapters\Role\Mappers\Entity $role,
+    MySQLAdapters\Account\Mappers\Entity $account,
   )
   {
-    parent::__construct($id, $created, $name, $email, $password, $role);
+    parent::__construct($id, $created, $name, $email, $password, $role, $account);
   }
 }

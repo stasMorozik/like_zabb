@@ -71,6 +71,11 @@ class Entity
     return $this->role;
   }
 
+  public function getAccount(): Core\Account\Entity
+  {
+    return $this->account;
+  }
+
   public static function new(
     Core\Account\Entity $account,
     Core\Role\Entity $role,
@@ -96,7 +101,8 @@ class Entity
       $maybe_name,
       $email,
       $maybe_password,
-      $role
+      $role,
+      $account
     );
   }
 

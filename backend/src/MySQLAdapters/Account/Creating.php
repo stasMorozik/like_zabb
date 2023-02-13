@@ -9,16 +9,16 @@ use Exception;
 class Creating implements Core\Account\Ports\Changing
 {
   public function change(
-    Core\Account\Entity $account, Core\User\Entity $user
+    Core\User\Entity $user
   ): Core\Common\Errors\InfraStructure | bool
   {
     try {
       DB::startTransaction();
 
       DB::insert('accounts', [
-        'id' => $account->getId(),
-        'email' => $account->getEmail()->getValue(),
-        'created' => $account->getCreated()
+        'id' => $user->getAccount()->getId(),
+        'email' => $user->getAccount()->getEmail()->getValue(),
+        'created' => $user->getAccount()->getCreated()
       ]);
 
       DB::insert('users', [
@@ -31,7 +31,7 @@ class Creating implements Core\Account\Ports\Changing
 
       DB::insert('user_account', [
         'user_id' => $user->getId(),
-        'account_id' => $account->getId()
+        'account_id' => $user->getAccount()->getId()
       ]);
 
       DB::insert('user_role', [

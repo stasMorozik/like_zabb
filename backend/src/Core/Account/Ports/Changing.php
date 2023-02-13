@@ -7,13 +7,12 @@ use Core;
 /**
  *
  * Creating and updating port
- *  
+ *
 **/
 
-interface Changing 
-{ 
+interface Changing
+{
   public function change(
-    Core\Account\Entity $account,
     Core\User\Entity $user
   ): Core\Common\Errors\InfraStructure | bool;
 }

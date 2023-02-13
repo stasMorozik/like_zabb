@@ -31,7 +31,7 @@ class AuthorizationTest extends TestCase
     $code = Core\ConfirmationCode\Entity::new($maybe_email);
     $account = Core\Account\Entity::new($code);
     $role = Core\Role\Entity::new(Core\Role\ValueObjects\Name::ADMIN);
-    $user = Core\User\Entity::new($account, $role, $this->password_salt, 'Joe', $this->password);
+    $user = Core\User\Entity::new($account, $role, $maybe_email, $this->password_salt, 'Joe', $this->password);
 
     $this->session = new Core\Session\Entity(
       $this->access_token_salt,

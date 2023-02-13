@@ -15,10 +15,10 @@ class Changing implements Core\Account\Ports\Changing
     $this->users = &$users;
   }
 
-  public function change(Core\Account\Entity $account, Core\User\Entity $user): Core\Common\Errors\InfraStructure | bool
+  public function change(Core\User\Entity $user): Core\Common\Errors\InfraStructure | bool
   {
-    $this->accounts[ $account->getEmail()->getValue() ] = $account;
-    
+    $this->accounts[ $user->getEmail()->getValue() ] = $user->getAccount();
+
     $this->users[ $user->getEmail()->getValue() ] = $user;
 
     return true;

@@ -67,6 +67,7 @@ class Creating
     $maybe_user = Core\User\Entity::new(
       $account,
       $maybe_role,
+      $maybe_email,
       $this->_salt,
       $name,
       $password
@@ -77,7 +78,6 @@ class Creating
     }
 
     return $this->_creating_account_port->change(
-      $account,
       $maybe_user
     );
   }
