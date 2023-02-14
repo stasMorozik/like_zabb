@@ -14,7 +14,7 @@ class Entity
   protected Core\Sensor\ValueObjects\Name $name;
   protected Core\Sensor\ValueObjects\Longitude $longitude;
   protected Core\Sensor\ValueObjects\Latitude $latitude;
-  protected Core\Sensor\ValueObjects\Status $sataus;
+  protected Core\Sensor\ValueObjects\Status $status;
   protected string $description;
   protected Core\User\Entity $owner;
 
@@ -24,7 +24,7 @@ class Entity
     Core\Sensor\ValueObjects\Name $name,
     Core\Sensor\ValueObjects\Longitude $longitude,
     Core\Sensor\ValueObjects\Latitude $latitude,
-    Core\Sensor\ValueObjects\Status $sataus,
+    Core\Sensor\ValueObjects\Status $status,
     string $description,
     Core\User\Entity $owner
   )
@@ -34,7 +34,7 @@ class Entity
     $this->name = $name;
     $this->longitude = $longitude;
     $this->latitude = $latitude;
-    $this->sataus = $sataus;
+    $this->status = $status;
     $this->description = $description;
     $this->owner = $owner;
   }
@@ -66,7 +66,7 @@ class Entity
 
   public function getStatus(): Core\Sensor\ValueObjects\Status
   {
-    return $this->sataus;
+    return $this->status;
   }
 
   public function getDescription(): string
@@ -81,9 +81,9 @@ class Entity
 
   public static function new(
     ?string $name,
-    ?int $longitude,
-    ?int $latitude,
-    ?string $sataus,
+    ?float $longitude,
+    ?float $latitude,
+    ?string $status,
     ?string $description,
     Core\User\Entity $owner
   ): Core\Common\Errors\Domain | Entity
@@ -106,10 +106,14 @@ class Entity
       return $maybe_latitude;
     }
 
-    $maybe_sataus = Core\Sensor\ValueObjects\Status::new($sataus);
+    $maybe_status = Core\Sensor\ValueObjects\Status::new($status);
 
-    if ($maybe_sataus instanceof Core\Common\Errors\Domain) {
-      return $maybe_sataus;
+    if ($maybe_status instanceof Core\Common\Errors\Domain) {
+      return $maybe_status;
+    }
+
+    if ($owner->isAdmin() !== true && $owner->isRoot() !== true) {
+      return new Core\Common\Errors\Domain('You have not right for create a sensor');
     }
 
     return new Entity(
@@ -118,22 +122,54 @@ class Entity
       $maybe_name,
       $maybe_longitude,
       $maybe_latitude,
-      $maybe_sataus,
+      $maybe_status,
       $description ? $description : '',
       $owner
     );
   }
-  // protected function isOwner(Core\User\Entity $owner): bool | Core\Common\Errors\Domain
-  // {
-  //   if ($owner->getId() != $this->owner->getId()) {
-  //     new Core\Common\Errors\Domain('You have not right for update status of this sensor');
-  //   }
 
-  //   return true;
-  // }
+  protected function isOwner(Core\User\Entity $owner): bool | Core\Common\Errors\Domain
+  {
+    if ($owner->getAccount()->getId() != $this->owner->getAccount()->getId()) {
+      return new Core\Common\Errors\Domain('You have not right for update status of this sensor');
+    }
 
-  // public function updtaeStatus(?string $sataus, Core\User\Entity $owner)
-  // {
+    return true;
+  }
 
-  // }
+  protected function haveRights(): bool | Core\Common\Errors\Domain
+  {
+    if ($this->getOwner()->isAdmin() === true || $this->getOwner()->isRoot() === true) {
+      return true;
+    }
+
+    return new Core\Common\Errors\Domain('You have not right for update status of this sensor');
+  }
+
+  public function updtaeStatus(Core\User\Entity $owner, ?string $status): bool | Core\Common\Errors\Domain
+  {
+    $have_rights = $this->haveRights();
+    if ($have_rights !== true) {
+      return $have_rights;
+    }
+
+    $is_owner = $this->isOwner($owner);
+    if ($is_owner !== true) {
+      return $is_owner;
+    }
+
+    $maybe_status = Core\Sensor\ValueObjects\Status::new($status);
+
+    if ($maybe_status instanceof Core\Common\Errors\Domain) {
+      return $maybe_status;
+    }
+
+    if ($maybe_status->getValue() == $this->getStatus()->getValue()) {
+      return new Core\Common\Errors\Domain('Status already updated');
+    }
+
+    $this->status = $maybe_status;
+
+    return true;
+  }
 }

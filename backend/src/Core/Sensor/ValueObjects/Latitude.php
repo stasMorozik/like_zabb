@@ -12,12 +12,12 @@ use Core;
 
 class Latitude extends Core\Common\ValueObjects\Common
 {
-  protected function __construct(int $latitude)
+  protected function __construct(float $latitude)
   {
     parent::__construct($latitude);
   }
 
-  public static function new(?int $latitude): Latitude | Core\Common\Errors\Domain
+  public static function new(?float $latitude): Latitude | Core\Common\Errors\Domain
   {
     return match ($latitude > 90.0 || $latitude < -90.0) {
       false => new Latitude($latitude),

@@ -12,12 +12,12 @@ use Core;
 
 class Longitude extends Core\Common\ValueObjects\Common
 {
-  protected function __construct(int $longitude)
+  protected function __construct(float $longitude)
   {
     parent::__construct($longitude);
   }
 
-  public static function new(?int $longitude): Longitude | Core\Common\Errors\Domain
+  public static function new(?float $longitude): Longitude | Core\Common\Errors\Domain
   {
     return match ($longitude > 180.0 || $longitude < -180.0) {
       false => new Longitude($longitude),

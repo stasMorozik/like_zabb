@@ -25,7 +25,7 @@ class Status extends Core\Common\ValueObjects\Common
     return match ($status) {
       self::ACTIVE => new Status($status),
       self::NOT_AVAILABLE => new Status($status),
-      default => new Core\Common\Errors\Domain('Invalid status)
+      default => new Core\Common\Errors\Domain('Invalid status')
     };
   }
 }
