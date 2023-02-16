@@ -14,7 +14,7 @@ DB::$port = $_ENV["DB_PORT"];
 DB::$encoding = 'utf8';
 DB::$connect_options = array(MYSQLI_OPT_CONNECT_TIMEOUT => 10);
 
-DB::query("CREATE TABLE users(
+DB::query("CREATE TABLE IF NOT EXISTS users(
   id BINARY(36) not null,
   name varchar(128) not null,
   created date not null,
@@ -23,14 +23,14 @@ DB::query("CREATE TABLE users(
   primary key(id)
 )");
 
-DB::query("CREATE TABLE accounts(
+DB::query("CREATE TABLE IF NOT EXISTS accounts(
   id BINARY(36) not null,
   created date not null,
   email varchar(128) unique not null,
   primary key(id)
 )");
 
-DB::query("CREATE TABLE confirmation_codes(
+DB::query("CREATE TABLE IF NOT EXISTS confirmation_codes(
   id BINARY(36) not null,
   created INT,
   email varchar(128) unique not null,
@@ -39,19 +39,30 @@ DB::query("CREATE TABLE confirmation_codes(
   primary key(id)
 )");
 
-DB::query("CREATE TABLE roles(
+DB::query("CREATE TABLE IF NOT EXISTS roles(
   id BINARY(36) not null,
   created date not null,
   name varchar(128) unique not null,
   primary key(id)
 )");
 
-DB::query("INSERT INTO roles (id, name, created) VALUES (UUID(), 'ADMIN', CURDATE())");
-DB::query("INSERT INTO roles (id, name, created) VALUES (UUID(), 'SUPER', CURDATE())");
-DB::query("INSERT INTO roles (id, name, created) VALUES (UUID(), 'USER', CURDATE())");
-DB::query("INSERT INTO roles (id, name, created) VALUES (UUID(), 'OBSERVER', CURDATE())");
+DB::query("CREATE TABLE IF NOT EXISTS sensors(
+  id BINARY(36) not null,
+  created date not null,
+  name varchar(128) not null,
+  longitude float not null,
+  latitude float not null,
+  status varchar(36) not null,
+  description text,
+  primary key(id)
+)");
 
-DB::query("CREATE TABLE user_role (
+DB::query("REPLACE INTO roles (id, name, created) VALUES (UUID(), 'ADMIN', CURDATE())");
+DB::query("REPLACE INTO roles (id, name, created) VALUES (UUID(), 'SUPER', CURDATE())");
+DB::query("REPLACE INTO roles (id, name, created) VALUES (UUID(), 'USER', CURDATE())");
+DB::query("REPLACE INTO roles (id, name, created) VALUES (UUID(), 'OBSERVER', CURDATE())");
+
+DB::query("CREATE TABLE IF NOT EXISTS user_role (
   user_id BINARY(36) unique not null,
 
   role_id BINARY(36) not null,
@@ -66,7 +77,7 @@ DB::query("CREATE TABLE user_role (
     ON UPDATE RESTRICT
 )");
 
-DB::query("CREATE TABLE user_account (
+DB::query("CREATE TABLE IF NOT EXISTS user_account (
   user_id BINARY(36) unique not null,
   account_id BINARY(36) not null,
 
@@ -76,6 +87,20 @@ DB::query("CREATE TABLE user_account (
     ON UPDATE RESTRICT,
   CONSTRAINT `fk_user_account_account_id`
     FOREIGN KEY (account_id) REFERENCES accounts (id)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT
+)");
+
+DB::query("CREATE TABLE IF NOT EXISTS account_sensor (
+  account_id BINARY(36) not null,
+  sensor_id BINARY(36) unique not null,
+
+  CONSTRAINT `fk_account_sensor_account_id`
+    FOREIGN KEY (account_id) REFERENCES accounts (id)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT,
+  CONSTRAINT `fk_account_sensor_sensor_id`
+    FOREIGN KEY (sensor_id) REFERENCES sensors (id)
     ON DELETE CASCADE
     ON UPDATE RESTRICT
 )");

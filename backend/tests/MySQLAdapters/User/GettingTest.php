@@ -71,7 +71,6 @@ class GettingTest extends TestCase
 
   public function testGet(): void
   {
-
     $maybe_user = self::$getting_user_adapter->get(
       new MySQLAdapters\Common\Mappers\ValueObjects\Email(
         self::$email
