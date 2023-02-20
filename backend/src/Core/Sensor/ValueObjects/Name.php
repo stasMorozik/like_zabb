@@ -31,7 +31,7 @@ class Name extends Core\Common\ValueObjects\Common
       return new Core\Common\Errors\Domain('Invalid name');
     }
 
-    if (!preg_match("/^([A-za-z0-9\-\_\s]+|\d+)$/i", $name)) {
+    if (!preg_match("/^[a-zA-Z0-9\s\-\_]+$/i", $name);) {
       return new Core\Common\Errors\Domain('Invalid name');
     }
 
