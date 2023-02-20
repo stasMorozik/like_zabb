@@ -7,7 +7,7 @@ use Core;
 /**
  *
  * Value Object of Password, for user or something alike
- *  
+ *
 **/
 
 class Password extends Core\Common\ValueObjects\Common
@@ -31,18 +31,18 @@ class Password extends Core\Common\ValueObjects\Common
       return new Core\Common\Errors\Domain('Invalid password');
     }
 
-    if (strlen($password) > 10) {
+    if (mb_strlen($password, 'UTF-8') > 10) {
       return new Core\Common\Errors\Domain('Invalid password');
     }
 
-    if (strlen($password) < 5) {
+    if (mb_strlen($password, 'UTF-8') < 5) {
       return new Core\Common\Errors\Domain('Invalid password');
     }
-    
+
     return new Password(crypt($password, $salt));
   }
 
-  public function validate(string $password, string $salt): Core\Common\Errors\Domain | bool 
+  public function validate(string $password, string $salt): Core\Common\Errors\Domain | bool
   {
     if (!hash_equals($this->value, crypt($password, $salt))) {
       return new Core\Common\Errors\Domain('Wrong password');
