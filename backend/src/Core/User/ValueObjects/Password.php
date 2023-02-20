@@ -23,10 +23,6 @@ class Password extends Core\Common\ValueObjects\Common
       return new Core\Common\Errors\Domain('Invalid password');
     }
 
-    if (gettype($password) != "string") {
-      return new Core\Common\Errors\Domain('Invalid password');
-    }
-
     if(preg_match("/[А-я,Ё,ё]/", $password)) {
       return new Core\Common\Errors\Domain('Invalid password');
     }

@@ -7,7 +7,7 @@ use Core;
 /**
  *
  * ValueObject Email
- *  
+ *
 **/
 
 class Email extends Core\Common\ValueObjects\Common
@@ -23,10 +23,6 @@ class Email extends Core\Common\ValueObjects\Common
       return new Core\Common\Errors\Domain('Invalid email');
     }
 
-    if (gettype($email) != "string") {
-      return new Core\Common\Errors\Domain('Invalid email');
-    }
-    
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
       return new Core\Common\Errors\Domain('Invalid email');
     }

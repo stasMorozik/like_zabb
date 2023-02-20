@@ -23,10 +23,6 @@ class Name extends Core\Common\ValueObjects\Common
       return new Core\Common\Errors\Domain('Invalid name');
     }
 
-    if (gettype($name) != "string") {
-      return new Core\Common\Errors\Domain('Invalid name');
-    }
-
     if (mb_strlen($name, 'UTF-8') < 2 || mb_strlen($name, 'UTF-8') > 30) {
       return new Core\Common\Errors\Domain('Invalid name');
     }
