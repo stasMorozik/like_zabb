@@ -48,6 +48,8 @@ class Creating implements Core\Account\Ports\Changing
       if ($e->getCode() == 1062) {
         return new Core\Common\Errors\InfraStructure('User already exists');
       }
+
+      throw $e;
     }
   }
 }
