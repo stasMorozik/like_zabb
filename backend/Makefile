@@ -1,7 +1,7 @@
-build_db:
+run_db:
   docker run --rm --name db_zabb -v /projects/mysql_like_zab/:/var/lib/mysql_like_zab -e MYSQL_ROOT_PASSWORD=12345 -e MYSQL_PASSWORD=12345 -e MYSQL_USER=db_user -e MYSQL_DATABASE=zabb -p 3306:3306 -d mysql:debian
 
-build_db_test:
+run_db_test:
   docker run --rm --name db_zabb_test -v /projects/mysql_like_zab_test/:/var/lib/mysql_like_zab_test -e MYSQL_ROOT_PASSWORD=12345 -e MYSQL_PASSWORD=12345 -e MYSQL_USER=db_user -e MYSQL_DATABASE=zabb -e MYSQL_TCP_PORT=3307 -p 3307:3306 -d mysql:debian
 
 build_migration:
