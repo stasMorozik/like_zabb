@@ -7,30 +7,30 @@ use Core;
 use Tests;
 
 
-class CreatingTest extends TestCase 
+class CreatingTest extends TestCase
 {
-  protected $codes = [];
-  protected $creating_code_adapter;
-  protected $getting_code_adapter;
-  protected $notifying_adapter;
-  protected $creating_code_use_case;
+  protected static $codes = [];
+  protected static $creating_code_adapter;
+  protected static $getting_code_adapter;
+  protected static $notifying_adapter;
+  protected static $creating_code_use_case;
 
   protected function setUp(): void
   {
-    $this->creating_code_adapter = new Tests\Core\ConfirmationCode\Adapters\Changing($this->codes);
-    $this->getting_code_adapter = new Tests\Core\ConfirmationCode\Adapters\Getting($this->codes);
-    $this->notifying_adapter = new Tests\Core\ConfirmationCode\Adapters\Notifying();
-    $this->creating_code_use_case = new Core\ConfirmationCode\UseCases\Creating(
-      $this->creating_code_adapter,
-      $this->getting_code_adapter,
-      $this->notifying_adapter
+    self::$creating_code_adapter = new Tests\Core\ConfirmationCode\Adapters\Changing(self::$codes);
+    self::$getting_code_adapter = new Tests\Core\ConfirmationCode\Adapters\Getting(self::$codes);
+    self::$notifying_adapter = new Tests\Core\ConfirmationCode\Adapters\Notifying();
+    self::$creating_code_use_case = new Core\ConfirmationCode\UseCases\Creating(
+      self::$creating_code_adapter,
+      self::$getting_code_adapter,
+      self::$notifying_adapter
     );
   }
 
   public function testCreateCode(): void
   {
 
-    $maybe_true = $this->creating_code_use_case->create('name@gmail.com');
+    $maybe_true = self::$creating_code_use_case->create(['email' => 'name@gmail.com']);
 
     $this->assertSame(
       $maybe_true,
@@ -41,7 +41,7 @@ class CreatingTest extends TestCase
   public function testInvalidEmail(): void
   {
 
-    $maybe_true = $this->creating_code_use_case->create('name@gmail.');
+    $maybe_true = self::$creating_code_use_case->create(['email' => 'name@gmail.']);
 
     $this->assertInstanceOf(
       Core\Common\Errors\Domain::class,

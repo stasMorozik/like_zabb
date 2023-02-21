@@ -17,12 +17,12 @@ class Authentication
     $this->_authentication_use_case = $authentication_use_case;
   }
 
-  public function auth(?string $email, ?string $password)
+  public function auth(array $args)
   {
     $resp = new JsonResponse();
 
     try {
-      $result = $this->_authentication_use_case->auth($email, $password);
+      $result = $this->_authentication_use_case->auth($args);
 
       if (($result instanceof Core\Session\Entity) == false) {
         return $resp->setStatusCode(400)->setData(["message" => $result->getMessage()]);
@@ -30,8 +30,8 @@ class Authentication
 
       session_start();
 
-      $_SESSION["access_token"] = $result->access_token;
-      $_SESSION["refresh_token"] = $result->refresh_token;
+      $_SESSION["access_token"] = $result->getAccessToken();
+      $_SESSION["refresh_token"] = $result->getRefreshToken();
 
       return $resp->setStatusCode(200)->setData(true);
 

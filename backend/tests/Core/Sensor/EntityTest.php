@@ -12,13 +12,28 @@ class EntityTest extends TestCase
 
   public function testNewSensor(): void
   {
-    $maybe_email = Core\Common\ValueObjects\Email::new(self::$email);
-    $code = Core\ConfirmationCode\Entity::new($maybe_email);
-    $account = Core\Account\Entity::new($code);
-    $role = Core\Role\Entity::new(Core\Role\ValueObjects\Name::ADMIN);
-    $user = Core\User\Entity::new($account, $role, $maybe_email, self::$salt, 'Joe', '12345');
+    $maybe_email = Core\Common\ValueObjects\Email::new(['email' => self::$email]);
+    $code = Core\ConfirmationCode\Entity::new(['email' => $maybe_email]);
+    $account = Core\Account\Entity::new(['code' => $code]);
+    $role = Core\Role\Entity::new(['name' => Core\Role\ValueObjects\Name::ADMIN]);
 
-    $maybe_sensor = Core\Sensor\Entity::new('EXAMPLE-891_98', 167.3, 64.6, Core\Sensor\ValueObjects\Status::NOT_AVAILABLE, 'Example', $user);
+    $user = Core\User\Entity::new([
+      'account' => $account,
+      'role' => $role,
+      'email' => $maybe_email,
+      'salt' => self::$salt,
+      'name' => 'Joe',
+      'password' => '12345'
+    ]);
+
+    $maybe_sensor = Core\Sensor\Entity::new([
+      'name' => 'EXAMPLE-891_98',
+      'longitude' => 167.3,
+      'latitude' => 64.6,
+      'status' => Core\Sensor\ValueObjects\Status::NOT_AVAILABLE,
+      'description' => 'Example',
+      'owner' => $user
+    ]);
 
     $this->assertInstanceOf(
       Core\Sensor\Entity::class,
@@ -28,13 +43,28 @@ class EntityTest extends TestCase
 
   public function testInvalidName(): void
   {
-    $maybe_email = Core\Common\ValueObjects\Email::new(self::$email);
-    $code = Core\ConfirmationCode\Entity::new($maybe_email);
-    $account = Core\Account\Entity::new($code);
-    $role = Core\Role\Entity::new(Core\Role\ValueObjects\Name::ADMIN);
-    $user = Core\User\Entity::new($account, $role, $maybe_email, self::$salt, 'Joe', '12345');
+    $maybe_email = Core\Common\ValueObjects\Email::new(['email' => self::$email]);
+    $code = Core\ConfirmationCode\Entity::new(['email' => $maybe_email]);
+    $account = Core\Account\Entity::new(['code' => $code]);
+    $role = Core\Role\Entity::new(['name' => Core\Role\ValueObjects\Name::ADMIN]);
 
-    $maybe_sensor = Core\Sensor\Entity::new('EXAMPLE-891_98?', 167.3, 64.6, Core\Sensor\ValueObjects\Status::NOT_AVAILABLE, 'Example', $user);
+    $user = Core\User\Entity::new([
+      'account' => $account,
+      'role' => $role,
+      'email' => $maybe_email,
+      'salt' => self::$salt,
+      'name' => 'Joe',
+      'password' => '12345'
+    ]);
+
+    $maybe_sensor = Core\Sensor\Entity::new([
+      'name' => 'EXAMPLE-891_98?',
+      'longitude' => 167.3,
+      'latitude' => 64.6,
+      'status' => Core\Sensor\ValueObjects\Status::NOT_AVAILABLE,
+      'description' => 'Example',
+      'owner' => $user
+    ]);
 
     $this->assertInstanceOf(
       Core\Common\Errors\Domain::class,
@@ -44,18 +74,33 @@ class EntityTest extends TestCase
 
   public function testUpdateStatus(): void
   {
-    $maybe_email = Core\Common\ValueObjects\Email::new(self::$email);
-    $code = Core\ConfirmationCode\Entity::new($maybe_email);
-    $account = Core\Account\Entity::new($code);
-    $role = Core\Role\Entity::new(Core\Role\ValueObjects\Name::ADMIN);
-    $user = Core\User\Entity::new($account, $role, $maybe_email, self::$salt, 'Joe', '12345');
+    $maybe_email = Core\Common\ValueObjects\Email::new(['email' => self::$email]);
+    $code = Core\ConfirmationCode\Entity::new(['email' => $maybe_email]);
+    $account = Core\Account\Entity::new(['code' => $code]);
+    $role = Core\Role\Entity::new(['name' => Core\Role\ValueObjects\Name::ADMIN]);
 
-    $sensor = Core\Sensor\Entity::new('EXAMPLE-891_98', 167.3, 64.6, Core\Sensor\ValueObjects\Status::NOT_AVAILABLE, 'Example', $user);
+    $user = Core\User\Entity::new([
+      'account' => $account,
+      'role' => $role,
+      'email' => $maybe_email,
+      'salt' => self::$salt,
+      'name' => 'Joe',
+      'password' => '12345'
+    ]);
 
-    $maybe_true = $sensor->updtaeStatus(
-      $user,
-      Core\Sensor\ValueObjects\Status::ACTIVE
-    );
+    $sensor = Core\Sensor\Entity::new([
+      'name' => 'EXAMPLE-891_98',
+      'longitude' => 167.3,
+      'latitude' => 64.6,
+      'status' => Core\Sensor\ValueObjects\Status::NOT_AVAILABLE,
+      'description' => 'Example',
+      'owner' => $user
+    ]);
+
+    $maybe_true = $sensor->updtaeStatus([
+      'owner' => $user,
+      'status' => Core\Sensor\ValueObjects\Status::ACTIVE
+    ]);
 
     $this->assertSame(
       true,
@@ -65,24 +110,47 @@ class EntityTest extends TestCase
 
   public function testInvalidOwner(): void
   {
-    $maybe_email = Core\Common\ValueObjects\Email::new(self::$email);
-    $code = Core\ConfirmationCode\Entity::new($maybe_email);
-    $account = Core\Account\Entity::new($code);
-    $role = Core\Role\Entity::new(Core\Role\ValueObjects\Name::ADMIN);
-    $user = Core\User\Entity::new($account, $role, $maybe_email, self::$salt, 'Joe', '12345');
+    $maybe_email = Core\Common\ValueObjects\Email::new(['email' => self::$email]);
+    $code = Core\ConfirmationCode\Entity::new(['email' => $maybe_email]);
+    $account = Core\Account\Entity::new(['code' => $code]);
+    $role = Core\Role\Entity::new(['name' => Core\Role\ValueObjects\Name::ADMIN]);
 
-    $sensor = Core\Sensor\Entity::new('EXAMPLE-891_98', 167.3, 64.6, Core\Sensor\ValueObjects\Status::NOT_AVAILABLE, 'Example', $user);
+    $user = Core\User\Entity::new([
+      'account' => $account,
+      'role' => $role,
+      'email' => $maybe_email,
+      'salt' => self::$salt,
+      'name' => 'Joe',
+      'password' => '12345'
+    ]);
 
-    $maybe_email = Core\Common\ValueObjects\Email::new(self::$email);
-    $code = Core\ConfirmationCode\Entity::new($maybe_email);
-    $account = Core\Account\Entity::new($code);
-    $role = Core\Role\Entity::new(Core\Role\ValueObjects\Name::ADMIN);
-    $user = Core\User\Entity::new($account, $role, $maybe_email, self::$salt, 'Joe', '12345');
+    $sensor = Core\Sensor\Entity::new([
+      'name' => 'EXAMPLE-891_98',
+      'longitude' => 167.3,
+      'latitude' => 64.6,
+      'status' => Core\Sensor\ValueObjects\Status::NOT_AVAILABLE,
+      'description' => 'Example',
+      'owner' => $user
+    ]);
 
-    $maybe_true = $sensor->updtaeStatus(
-      $user,
-      Core\Sensor\ValueObjects\Status::ACTIVE
-    );
+    $maybe_email = Core\Common\ValueObjects\Email::new(['email' => self::$email]);
+    $code = Core\ConfirmationCode\Entity::new(['email' => $maybe_email]);
+    $account = Core\Account\Entity::new(['code' => $code]);
+    $role = Core\Role\Entity::new(['name' => Core\Role\ValueObjects\Name::ADMIN]);
+
+    $user = Core\User\Entity::new([
+      'account' => $account,
+      'role' => $role,
+      'email' => $maybe_email,
+      'salt' => self::$salt,
+      'name' => 'Joe',
+      'password' => '12345'
+    ]);
+
+    $maybe_true = $sensor->updtaeStatus([
+      'onwer' => $user,
+      'status' => Core\Sensor\ValueObjects\Status::ACTIVE
+    ]);
 
     $this->assertInstanceOf(
       Core\Common\Errors\Domain::class,
@@ -92,13 +160,28 @@ class EntityTest extends TestCase
 
   public function testInvalidRole(): void
   {
-    $maybe_email = Core\Common\ValueObjects\Email::new(self::$email);
-    $code = Core\ConfirmationCode\Entity::new($maybe_email);
-    $account = Core\Account\Entity::new($code);
-    $role = Core\Role\Entity::new(Core\Role\ValueObjects\Name::USER);
-    $user = Core\User\Entity::new($account, $role, $maybe_email, self::$salt, 'Joe', '12345');
+    $maybe_email = Core\Common\ValueObjects\Email::new(['email' => self::$email]);
+    $code = Core\ConfirmationCode\Entity::new(['email' => $maybe_email]);
+    $account = Core\Account\Entity::new(['code' => $code]);
+    $role = Core\Role\Entity::new(['name' => Core\Role\ValueObjects\Name::USER]);
 
-    $maybe_sensor = Core\Sensor\Entity::new('EXAMPLE-891_98', 167.3, 64.6, Core\Sensor\ValueObjects\Status::NOT_AVAILABLE, 'Example', $user);
+    $user = Core\User\Entity::new([
+      'account' => $account,
+      'role' => $role,
+      'email' => $maybe_email,
+      'salt' => self::$salt,
+      'name' => 'Joe',
+      'password' => '12345'
+    ]);
+
+    $maybe_sensor = Core\Sensor\Entity::new([
+      'name' => 'EXAMPLE-891_98',
+      'longitude' => 167.3,
+      'latitude' => 64.6,
+      'status' => Core\Sensor\ValueObjects\Status::NOT_AVAILABLE,
+      'description' => 'Example',
+      'owner' => $user
+    ]);
 
     $this->assertInstanceOf(
       Core\Common\Errors\Domain::class,

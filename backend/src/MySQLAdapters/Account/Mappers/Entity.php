@@ -9,10 +9,10 @@ class Entity extends Core\Account\Entity
 {
   public function __construct(
     string $id,
-    Core\Common\ValueObjects\Email $email,
-    DateTime $created
+    DateTime $created,
+    Core\Common\ValueObjects\Email $email
   )
   {
-    parent::__construct($id, $email, $created);
+    parent::__construct($id, $created, $email);
   }
 }

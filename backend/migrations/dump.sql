@@ -1,4 +1,13 @@
-CREATE TABLE IF NOT EXISTS users(
+DROP TABLE IF EXISTS user_role;
+DROP TABLE IF EXISTS user_account;
+DROP TABLE IF EXISTS account_sensor;
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS accounts;
+DROP TABLE IF EXISTS confirmation_codes;
+DROP TABLE IF EXISTS roles;
+DROP TABLE IF EXISTS sensors;
+
+CREATE TABLE users(
   id BINARY(36) not null,
   name varchar(128) not null,
   created date not null,
@@ -7,30 +16,31 @@ CREATE TABLE IF NOT EXISTS users(
   primary key(id)
 );
 
-CREATE TABLE IF NOT EXISTS accounts(
+CREATE TABLE accounts(
   id BINARY(36) not null,
   created date not null,
   email varchar(128) unique not null,
   primary key(id)
 );
 
-CREATE TABLE IF NOT EXISTS confirmation_codes(
+CREATE TABLE confirmation_codes(
   id BINARY(36) not null,
-  created INT,
+  created date not null,
+  created_time INT,
   email varchar(128) unique not null,
   code SMALLINT,
   confirmed BOOLEAN,
   primary key(id)
 );
 
-CREATE TABLE IF NOT EXISTS roles(
+CREATE TABLE roles(
   id BINARY(36) not null,
   created date not null,
   name varchar(128) unique not null,
   primary key(id)
 );
 
-CREATE TABLE IF NOT EXISTS sensors(
+CREATE TABLE sensors(
   id BINARY(36) not null,
   created date not null,
   name varchar(128) not null,
@@ -46,7 +56,7 @@ REPLACE INTO roles (id, name, created) VALUES (UUID(), 'SUPER', CURDATE());
 REPLACE INTO roles (id, name, created) VALUES (UUID(), 'USER', CURDATE());
 REPLACE INTO roles (id, name, created) VALUES (UUID(), 'OBSERVER', CURDATE());
 
-CREATE TABLE IF NOT EXISTS user_role (
+CREATE TABLE user_role (
   user_id BINARY(36) unique not null,
   role_id BINARY(36) not null,
 
@@ -60,7 +70,7 @@ CREATE TABLE IF NOT EXISTS user_role (
     ON UPDATE RESTRICT
 );
 
-CREATE TABLE IF NOT EXISTS user_account (
+CREATE TABLE user_account (
   user_id BINARY(36) unique not null,
   account_id BINARY(36) not null,
 
@@ -74,7 +84,7 @@ CREATE TABLE IF NOT EXISTS user_account (
     ON UPDATE RESTRICT
 );
 
-CREATE TABLE IF NOT EXISTS account_sensor (
+CREATE TABLE account_sensor (
   account_id BINARY(36) not null,
   sensor_id BINARY(36) unique not null,
 

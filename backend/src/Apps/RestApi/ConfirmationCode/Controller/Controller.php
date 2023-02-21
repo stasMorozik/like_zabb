@@ -18,9 +18,7 @@ class Controller extends AbstractController
   {
     $params = json_decode($request->getContent());
 
-    return $_creating_service->create(
-      $params->{'email'}
-    );
+    return $_creating_service->create(['email' => $params->{'email'}]);
   }
 
   #[Route('/confirmation-code', name: 'confirm', methods: 'PUT')]
@@ -31,9 +29,9 @@ class Controller extends AbstractController
   {
     $params = json_decode($request->getContent());
 
-    return $_confirming_service->confirm(
-      $params->{'email'},
-      (int) $params->{'code'}
-    );
+    return $_confirming_service->confirm([
+      'email' => $params->{'email'},
+      'code' => $params->{'code'}
+    ]);
   }
 }

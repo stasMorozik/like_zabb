@@ -7,10 +7,10 @@ use Core;
 /**
  *
  * Confirming Use Case
- *  
+ *
 **/
 
-class Confirming 
+class Confirming
 {
   private Core\ConfirmationCode\Ports\Changing $_updating_port;
   private Core\ConfirmationCode\Ports\Getting $_getting_port;
@@ -24,13 +24,18 @@ class Confirming
     $this->_getting_port = $getting_port;
   }
 
-  public function confirm(
-    ?string $email,
-    ?int $code
-  ): Core\Common\Errors\Domain | Core\Common\Errors\InfraStructure | bool
+  public function confirm(array $args): Core\Common\Errors\Domain | Core\Common\Errors\InfraStructure | bool
   {
+    $keys = ['email', 'code'];
+
+    foreach ($keys as &$k) {
+      if (!isset($args[$k])) {
+        return new Core\Common\Errors\Domain('Invalid arguments');
+      }
+    }
+
     //Validate email address
-    $maybe_email = Core\Common\ValueObjects\Email::new($email);
+    $maybe_email = Core\Common\ValueObjects\Email::new(['email' => $args['email']]);
     if ($maybe_email instanceof Core\Common\Errors\Domain) {
       return $maybe_email;
     }
@@ -42,7 +47,7 @@ class Confirming
     }
 
     //Confirming code
-    $maybe_true = $maybe_code->confirm($code);
+    $maybe_true = $maybe_code->confirm($args['code']);
     if ($maybe_true instanceof Core\Common\Errors\Domain) {
       return $maybe_true;
     }

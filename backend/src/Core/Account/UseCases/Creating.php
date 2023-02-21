@@ -30,20 +30,25 @@ class Creating
     $this->_getting_role_port = $getting_role_port;
   }
 
-  public function create(
-    ?string $email,
-    ?string $password,
-    ?string $name
-  ): Core\Common\Errors\Domain | Core\Common\Errors\InfraStructure | bool
+  public function create(array $args): Core\Common\Errors\Domain | Core\Common\Errors\InfraStructure | bool
   {
+    $keys = ['email', 'password', 'name'];
 
-    $maybe_role = $this->_getting_role_port->get(Core\Role\ValueObjects\Name::new(Core\Role\ValueObjects\Name::SUPER));
+    foreach ($keys as &$k) {
+      if (!isset($args[$k])) {
+        return new Core\Common\Errors\Domain('Invalid arguments');
+      }
+    }
+
+    $maybe_role = $this->_getting_role_port->get(Core\Role\ValueObjects\Name::new([
+      'name' => Core\Role\ValueObjects\Name::SUPER
+    ]));
 
     if ($maybe_role instanceof Core\Common\Errors\InfraStructure) {
       return $maybe_role;
     }
 
-    $maybe_email = Core\Common\ValueObjects\Email::new($email);
+    $maybe_email = Core\Common\ValueObjects\Email::new(['email' => $args['email']]);
 
     if ($maybe_email instanceof Core\Common\Errors\Domain) {
       return $maybe_email;
@@ -60,18 +65,18 @@ class Creating
       return $maybe_true;
     }
 
-    $account = Core\Account\Entity::new(
-      $maybe_code
-    );
+    $account = Core\Account\Entity::new(['code' => $maybe_code]);
 
-    $maybe_user = Core\User\Entity::new(
-      $account,
-      $maybe_role,
-      $maybe_email,
-      $this->_salt,
-      $name,
-      $password
-    );
+    $keys = ['account', 'role', 'email', 'salt', 'name', 'password'];
+
+    $maybe_user = Core\User\Entity::new([
+      'account' => $account,
+      'role' => $maybe_role,
+      'email' => $maybe_email,
+      'salt' => $this->_salt,
+      'name' => $args['name'],
+      'password' => $args['password']
+    ]);
 
     if ($maybe_user instanceof Core\Common\Errors\Domain) {
       return $maybe_user;

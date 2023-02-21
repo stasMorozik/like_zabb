@@ -5,13 +5,13 @@ namespace Tests\Core\ConfirmationCode;
 use PHPUnit\Framework\TestCase;
 use Core;
 
-class EntityTest extends TestCase 
+class EntityTest extends TestCase
 {
   public function testNewCode(): void
   {
-    $maybe_email = Core\Common\ValueObjects\Email::new('name@gmail.com');
+    $maybe_email = Core\Common\ValueObjects\Email::new(['email' => 'name@gmail.com']);
     if ($maybe_email instanceof Core\Common\ValueObjects\Email) {
-      $code = Core\ConfirmationCode\Entity::new($maybe_email);
+      $code = Core\ConfirmationCode\Entity::new(['email' => $maybe_email]);
 
       $this->assertInstanceOf(
         Core\ConfirmationCode\Entity::class,
@@ -22,9 +22,9 @@ class EntityTest extends TestCase
 
   public function testCheckLifetime(): void
   {
-    $maybe_email = Core\Common\ValueObjects\Email::new('name@gmail.com');
+    $maybe_email = Core\Common\ValueObjects\Email::new(['email' => 'name@gmail.com']);
     if ($maybe_email instanceof Core\Common\ValueObjects\Email) {
-      $code = Core\ConfirmationCode\Entity::new($maybe_email);
+      $code = Core\ConfirmationCode\Entity::new(['email' => $maybe_email]);
 
       $maybe_true = $code->checkLifetime();
 
@@ -37,9 +37,9 @@ class EntityTest extends TestCase
 
   public function testConfirm(): void
   {
-    $maybe_email = Core\Common\ValueObjects\Email::new('name@gmail.com');
+    $maybe_email = Core\Common\ValueObjects\Email::new(['email' => 'name@gmail.com']);
     if ($maybe_email instanceof Core\Common\ValueObjects\Email) {
-      $code = Core\ConfirmationCode\Entity::new($maybe_email);
+      $code = Core\ConfirmationCode\Entity::new(['email' => $maybe_email]);
 
       $maybe_true = $code->confirm($code->getCode());
 
@@ -52,9 +52,9 @@ class EntityTest extends TestCase
 
   public function testWrongCode(): void
   {
-    $maybe_email = Core\Common\ValueObjects\Email::new('name@gmail.com');
+    $maybe_email = Core\Common\ValueObjects\Email::new(['email' => 'name@gmail.com']);
     if ($maybe_email instanceof Core\Common\ValueObjects\Email) {
-      $code = Core\ConfirmationCode\Entity::new($maybe_email);
+      $code = Core\ConfirmationCode\Entity::new(['email' => $maybe_email]);
 
       $maybe_true = $code->confirm(12);
 

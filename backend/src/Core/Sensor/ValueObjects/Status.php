@@ -10,7 +10,7 @@ use Core;
  *
 **/
 
-class Status extends Core\Common\ValueObjects\Common
+class Status extends Core\Common\ValueObjects\ValueObject
 {
   const ACTIVE = 'ACTIVE';
   const NOT_AVAILABLE = 'NOT_AVAILABLE';
@@ -20,11 +20,15 @@ class Status extends Core\Common\ValueObjects\Common
     parent::__construct($status);
   }
 
-  public static function new(?string $status): Status | Core\Common\Errors\Domain
+  public static function new(array $args): Status | Core\Common\Errors\Domain
   {
-    return match ($status) {
-      self::ACTIVE => new Status($status),
-      self::NOT_AVAILABLE => new Status($status),
+    if (!isset($args['status'])) {
+      return new Core\Common\Errors\Domain('Invalid argument');
+    }
+
+    return match ($args['status']) {
+      self::ACTIVE => new Status(self::ACTIVE),
+      self::NOT_AVAILABLE => new Status(self::NOT_AVAILABLE),
       default => new Core\Common\Errors\Domain('Invalid status')
     };
   }

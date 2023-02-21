@@ -10,10 +10,10 @@ class Entity extends Core\Role\Entity
 {
   public function __construct(
     string $id,
-    MySQLAdapters\Role\Mappers\ValueObjects\Name $name,
-    DateTime $created
+    DateTime $created,
+    MySQLAdapters\Role\Mappers\ValueObjects\Name $name
   )
   {
-    parent::__construct($id, $name, $created);
+    parent::__construct($id, $created, $name);
   }
 }

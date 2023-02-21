@@ -10,7 +10,7 @@ use Core;
  *
 **/
 
-class Name extends Core\Common\ValueObjects\Common
+class Name extends Core\Common\ValueObjects\ValueObject
 {
   const SUPER = 'SUPER';
   const ADMIN = 'ADMIN';
@@ -22,13 +22,17 @@ class Name extends Core\Common\ValueObjects\Common
     parent::__construct($name);
   }
 
-  public static function new(?string $name): Name | Core\Common\Errors\Domain
+  public static function new(array $args): Name | Core\Common\Errors\Domain
   {
-    return match ($name) {
-      self::SUPER => new Name($name),
-      self::ADMIN => new Name($name),
-      self::USER => new Name($name),
-      self::OBSERVER => new Name($name),
+    if (!isset($args['name'])) {
+      return new Core\Common\Errors\Domain('Invalid argument');
+    }
+
+    return match ($args['name']) {
+      self::SUPER => new Name(self::SUPER),
+      self::ADMIN => new Name(self::ADMIN),
+      self::USER => new Name(self::USER),
+      self::OBSERVER => new Name(self::OBSERVER),
       default => new Core\Common\Errors\Domain('Invalid role')
     };
   }

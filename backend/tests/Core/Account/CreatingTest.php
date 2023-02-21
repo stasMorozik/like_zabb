@@ -8,65 +8,69 @@ use Tests;
 
 class CreatingTest extends TestCase
 {
-  protected $codes = [];
-  protected $users = [];
-  protected $roles = [];
-  protected $accounts = [];
-  protected $email = 'name@gmail.com';
-  protected $password = '12345';
-  protected $secret_key = 'some_secret';
+  protected static $codes = [];
+  protected static $users = [];
+  protected static $roles = [];
+  protected static $accounts = [];
+  protected static $email = 'name@gmail.com';
+  protected static $password = '12345';
+  protected static $secret_key = 'some_secret';
 
-  protected $creating_code_adapter;
-  protected $getting_code_adapter;
-  protected $notifying_adapter;
-  protected $creating_code_use_case;
-  protected $confirming_code_use_case;
-  protected $getting_role_adapter;
-  protected $creating_account_adapter;
-  protected $creating_account_use_case;
+  protected static $creating_code_adapter;
+  protected static $getting_code_adapter;
+  protected static $notifying_adapter;
+  protected static $creating_code_use_case;
+  protected static $confirming_code_use_case;
+  protected static $getting_role_adapter;
+  protected static $creating_account_adapter;
+  protected static $creating_account_use_case;
 
   protected function setUp(): void
   {
-    $this->creating_code_adapter = new Tests\Core\ConfirmationCode\Adapters\Changing($this->codes);
-    $this->getting_code_adapter = new Tests\Core\ConfirmationCode\Adapters\Getting($this->codes);
-    $this->notifying_adapter = new Tests\Core\ConfirmationCode\Adapters\Notifying();
-    $this->getting_role_adapter = new Tests\Core\Role\Adapters\Getting($this->roles);
+    self::$creating_code_adapter = new Tests\Core\ConfirmationCode\Adapters\Changing(self::$codes);
+    self::$getting_code_adapter = new Tests\Core\ConfirmationCode\Adapters\Getting(self::$codes);
+    self::$notifying_adapter = new Tests\Core\ConfirmationCode\Adapters\Notifying();
+    self::$getting_role_adapter = new Tests\Core\Role\Adapters\Getting(self::$roles);
 
-    $this->creating_code_use_case = new Core\ConfirmationCode\UseCases\Creating(
-      $this->creating_code_adapter,
-      $this->getting_code_adapter,
-      $this->notifying_adapter
+    self::$creating_code_use_case = new Core\ConfirmationCode\UseCases\Creating(
+      self::$creating_code_adapter,
+      self::$getting_code_adapter,
+      self::$notifying_adapter
     );
 
-    $this->confirming_code_use_case = new Core\ConfirmationCode\UseCases\Confirming(
-      $this->creating_code_adapter,
-      $this->getting_code_adapter
+    self::$confirming_code_use_case = new Core\ConfirmationCode\UseCases\Confirming(
+      self::$creating_code_adapter,
+      self::$getting_code_adapter
     );
 
-    $this->creating_code_use_case->create($this->email);
+    self::$creating_code_use_case->create(['email' => self::$email]);
 
-    $this->confirming_code_use_case->confirm(
-      $this->email,
-      $this->codes[$this->email]->getCode()
-    );
+    self::$confirming_code_use_case->confirm([
+      'email' => self::$email,
+      'code' => self::$codes[self::$email]->getCode()
+    ]);
 
-    $this->roles[Core\Role\ValueObjects\Name::SUPER] = new Tests\Core\Role\Adapters\Mappers\MapperEntity(
+    self::$roles[Core\Role\ValueObjects\Name::SUPER] = new Tests\Core\Role\Adapters\Mappers\MapperEntity(
       Core\Role\ValueObjects\Name::SUPER
     );
 
-    $this->creating_account_adapter = new Tests\Core\Account\Adapters\Changing($this->accounts, $this->users);
+    self::$creating_account_adapter = new Tests\Core\Account\Adapters\Changing(self::$accounts, self::$users);
 
-    $this->creating_account_use_case = new Core\Account\UseCases\Creating(
-      $this->secret_key,
-      $this->creating_account_adapter,
-      $this->getting_code_adapter,
-      $this->getting_role_adapter
+    self::$creating_account_use_case = new Core\Account\UseCases\Creating(
+      self::$secret_key,
+      self::$creating_account_adapter,
+      self::$getting_code_adapter,
+      self::$getting_role_adapter
     );
   }
 
   public function testCreateAccount(): void
   {
-    $maybe_true = $this->creating_account_use_case->create($this->email, $this->password, 'Name');
+    $maybe_true = self::$creating_account_use_case->create([
+      'email' => self::$email,
+      'password' => self::$password,
+      'name' => 'Name'
+    ]);
 
     $this->assertSame(
       true,
@@ -76,7 +80,11 @@ class CreatingTest extends TestCase
 
   public function testInvalidEamil(): void
   {
-    $maybe_true = $this->creating_account_use_case->create('name@gmail.', $this->password, 'Name');
+    $maybe_true = self::$creating_account_use_case->create([
+      'email' => 'name@gmail.',
+      'password' => self::$password,
+      'name' => 'Name'
+    ]);
 
     $this->assertInstanceOf(
       Core\Common\Errors\Domain::class,
@@ -86,7 +94,11 @@ class CreatingTest extends TestCase
 
   public function testCodeNotFound(): void
   {
-    $maybe_true = $this->creating_account_use_case->create('name1@gmail.com', $this->password, 'Name');
+    $maybe_true = self::$creating_account_use_case->create([
+      'email' => 'name1@gmail.com',
+      'password' => self::$password,
+      'name' => 'Name'
+    ]);
 
     $this->assertInstanceOf(
       Core\Common\Errors\InfraStructure::class,
@@ -96,7 +108,11 @@ class CreatingTest extends TestCase
 
   public function testInvalidName(): void
   {
-    $maybe_true = $this->creating_account_use_case->create($this->email, $this->password, 'Name1');
+    $maybe_true = self::$creating_account_use_case->create([
+      'email' => self::$email,
+      'password' => self::$password,
+      'name' => 'Name1'
+    ]);
 
     $this->assertInstanceOf(
       Core\Common\Errors\Domain::class,

@@ -24,11 +24,16 @@ class Authorization
     $this->_getting_port = $getting_port;
   }
 
-  public function auth(
-    ?string $access_token
-  ): Core\Common\Errors\InfraStructure | Core\Common\Errors\Domain | Core\User\Entity
+  public function auth(array $args): Core\Common\Errors\InfraStructure | Core\Common\Errors\Domain | Core\User\Entity
   {
-    $maybe_id = Core\Session\Entity::decode($this->_access_token_salt, $access_token);
+    if (!isset($args['access_token'])) {
+      return new Core\Common\Errors\Domain('Invalid argument');
+    }
+
+    $maybe_id = Core\Session\Entity::decode([
+      'access_token_salt' => $this->_access_token_salt,
+      'access_token' => $args['access_token']
+    ]);
 
     if ($maybe_id instanceof Core\Common\Errors\Domain) {
       return $maybe_id;

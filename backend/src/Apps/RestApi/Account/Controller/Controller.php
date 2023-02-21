@@ -18,10 +18,10 @@ class Controller extends AbstractController
   {
     $params = json_decode($request->getContent());
 
-    return $_creating_service->create(
-      $params->{'email'},
-      $params->{'password'},
-      $params->{'name'}
-    );
+    return $_creating_service->create([
+      'email' => $params->{'email'},
+      'password' => $params->{'password'},
+      'name' => $params->{'name'}
+    ]);
   }
 }

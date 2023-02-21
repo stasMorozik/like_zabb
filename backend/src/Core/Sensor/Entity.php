@@ -7,10 +7,8 @@ use DateTime;
 use Ramsey\Uuid\Uuid;
 
 
-class Entity
+class Entity extends Core\Common\Entity
 {
-  protected string $id;
-  protected DateTime $created;
   protected Core\Sensor\ValueObjects\Name $name;
   protected Core\Sensor\ValueObjects\Longitude $longitude;
   protected Core\Sensor\ValueObjects\Latitude $latitude;
@@ -29,24 +27,13 @@ class Entity
     Core\User\Entity $owner
   )
   {
-    $this->id = $id;
-    $this->created = $created;
     $this->name = $name;
     $this->longitude = $longitude;
     $this->latitude = $latitude;
     $this->status = $status;
     $this->description = $description;
     $this->owner = $owner;
-  }
-
-  public function getId(): string
-  {
-    return $this->id;
-  }
-
-  public function getCreated(): DateTime
-  {
-    return $this->created;
+    parent::__construct($id, $created);
   }
 
   public function getName(): Core\Sensor\ValueObjects\Name
@@ -79,40 +66,44 @@ class Entity
     return $this->owner;
   }
 
-  public static function new(
-    ?string $name,
-    ?float $longitude,
-    ?float $latitude,
-    ?string $status,
-    ?string $description,
-    Core\User\Entity $owner
-  ): Core\Common\Errors\Domain | Entity
+  public static function new(array $args): Core\Common\Errors\Domain | Entity
   {
-    $maybe_name = Core\Sensor\ValueObjects\Name::new($name);
+    $keys = ['name', 'longitude', 'latitude', 'status', 'description', 'owner'];
+    foreach ($keys as &$k) {
+      if (!isset($args[$k])) {
+        return new Core\Common\Errors\Domain('Invalid arguments');
+      }
+    }
+
+    $maybe_name = Core\Sensor\ValueObjects\Name::new(['name' => $args['name']]);
 
     if ($maybe_name instanceof Core\Common\Errors\Domain) {
       return $maybe_name;
     }
 
-    $maybe_longitude = Core\Sensor\ValueObjects\Longitude::new($longitude);
+    $maybe_longitude = Core\Sensor\ValueObjects\Longitude::new(['longitude' => $args['longitude']]);
 
     if ($maybe_longitude instanceof Core\Common\Errors\Domain) {
       return $maybe_longitude;
     }
 
-    $maybe_latitude = Core\Sensor\ValueObjects\Latitude::new($latitude);
+    $maybe_latitude = Core\Sensor\ValueObjects\Latitude::new(['latitude' => $args['latitude']]);
 
     if ($maybe_latitude instanceof Core\Common\Errors\Domain) {
       return $maybe_latitude;
     }
 
-    $maybe_status = Core\Sensor\ValueObjects\Status::new($status);
+    $maybe_status = Core\Sensor\ValueObjects\Status::new(['status' => $args['status']]);
 
     if ($maybe_status instanceof Core\Common\Errors\Domain) {
       return $maybe_status;
     }
 
-    if ($owner->isAdmin() !== true && $owner->isRoot() !== true) {
+    if (($args['owner'] instanceof Core\User\Entity) == false) {
+      return new Core\Common\Errors\Domain('Invalid user');
+    }
+
+    if ($args['owner']->isAdmin() !== true && $args['owner']->isRoot() !== true) {
       return new Core\Common\Errors\Domain('You have not right for create a sensor');
     }
 
@@ -123,8 +114,8 @@ class Entity
       $maybe_longitude,
       $maybe_latitude,
       $maybe_status,
-      $description ? $description : '',
-      $owner
+      $args['description'] ? $args['description'] : '',
+      $args['owner']
     );
   }
 
@@ -146,19 +137,27 @@ class Entity
     return new Core\Common\Errors\Domain('You have not right for update status of this sensor');
   }
 
-  public function updtaeStatus(Core\User\Entity $owner, ?string $status): bool | Core\Common\Errors\Domain
+  public function updtaeStatus(array $args): bool | Core\Common\Errors\Domain
   {
+    if (!isset($args['owner']) || !isset($args['status'])) {
+      return new Core\Common\Errors\Domain('Invalid argument');
+    }
+
+    if (($args['owner'] instanceof Core\User\Entity) == false) {
+      return new Core\Common\Errors\Domain('Invalid code');
+    }
+
     $have_rights = $this->haveRights();
     if ($have_rights !== true) {
       return $have_rights;
     }
 
-    $is_owner = $this->isOwner($owner);
+    $is_owner = $this->isOwner($args['owner']);
     if ($is_owner !== true) {
       return $is_owner;
     }
 
-    $maybe_status = Core\Sensor\ValueObjects\Status::new($status);
+    $maybe_status = Core\Sensor\ValueObjects\Status::new(['status' => $args['status']]);
 
     if ($maybe_status instanceof Core\Common\Errors\Domain) {
       return $maybe_status;

@@ -27,8 +27,8 @@ class CreatingTest extends TestCase
 
   public function testCreate(): void
   {
-    $maybe_email = Core\Common\ValueObjects\Email::new(self::$email);
-    $code = Core\ConfirmationCode\Entity::new($maybe_email);
+    $maybe_email = Core\Common\ValueObjects\Email::new(['email' => self::$email]);
+    $code = Core\ConfirmationCode\Entity::new(['email' => $maybe_email]);
 
     $maybe_true = self::$creating_code_adapter->change($code);
     $this->assertSame(

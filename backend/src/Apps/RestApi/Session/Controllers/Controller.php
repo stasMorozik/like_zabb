@@ -11,18 +11,18 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class Controller extends AbstractController
 {
-  #[Route('/session/refresh', name: 'refresh', methods: 'GET')]
+  #[Route('/session/', name: 'refresh', methods: 'PUT')]
   public function refresh(
     Apps\RestApi\Session\Services\Refreshing $_refreshing_service,
     Request $request
   ): JsonResponse
   {
-    return $_refreshing_service->refresh(
-      isset($_SESSION["refresh_token"]) ? $_SESSION["refresh_token"] : ''
-    );
+    return $_refreshing_service->refresh([
+      'refresh_token' => isset($_SESSION["refresh_token"]) ? $_SESSION["refresh_token"] : ''
+    ]);
   }
 
-  #[Route('/session/quit', name: 'quit', methods: 'DELETE')]
+  #[Route('/session/', name: 'quit', methods: 'DELETE')]
   public function quit(
     Request $request
   ): JsonResponse

@@ -10,17 +10,25 @@ use Core;
  *
 **/
 
-class Latitude extends Core\Common\ValueObjects\Common
+class Latitude extends Core\Common\ValueObjects\ValueObject
 {
   protected function __construct(float $latitude)
   {
     parent::__construct($latitude);
   }
 
-  public static function new(?float $latitude): Latitude | Core\Common\Errors\Domain
+  public static function new(array $args): Latitude | Core\Common\Errors\Domain
   {
-    return match ($latitude > 90.0 || $latitude < -90.0) {
-      false => new Latitude($latitude),
+    if (!isset($args['latitude'])) {
+      return new Core\Common\Errors\Domain('Invalid argument');
+    }
+
+    if (gettype($args['latitude']) != 'double') {
+      new Core\Common\Errors\Domain('Invalid latitude');
+    }
+
+    return match ($args['latitude'] > 90.0 || $args['latitude'] < -90.0) {
+      false => new Latitude($args['latitude']),
       default => new Core\Common\Errors\Domain('Invalid latitude')
     };
   }

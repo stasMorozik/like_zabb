@@ -10,27 +10,27 @@ use Core;
  *
 **/
 
-class Name extends Core\Common\ValueObjects\Common
+class Name extends Core\Common\ValueObjects\ValueObject
 {
-  protected function __construct(?string $name)
+  protected function __construct(string $name)
   {
     parent::__construct($name);
   }
 
-  public static function new(?string $name): Name | Core\Common\Errors\Domain
+  public static function new(array $args): Name | Core\Common\Errors\Domain
   {
-    if (!$name) {
+    if (!isset($args['name'])) {
+      return new Core\Common\Errors\Domain('Invalid argument');
+    }
+
+    if (mb_strlen($args['name'], 'UTF-8') < 2 || mb_strlen($args['name'], 'UTF-8') > 30) {
       return new Core\Common\Errors\Domain('Invalid name');
     }
 
-    if (mb_strlen($name, 'UTF-8') < 2 || mb_strlen($name, 'UTF-8') > 30) {
+    if (!preg_match("/^[a-zA-Z0-9\s\-\_]+$/i", $args['name'])) {
       return new Core\Common\Errors\Domain('Invalid name');
     }
 
-    if (!preg_match("/^[a-zA-Z0-9\s\-\_]+$/i", $name);) {
-      return new Core\Common\Errors\Domain('Invalid name');
-    }
-
-    return new Name($name);
+    return new Name($args['name']);
   }
 }

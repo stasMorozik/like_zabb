@@ -5,6 +5,7 @@ namespace MySQLAdapters\ConfirmationCode;
 use DB;
 use Core;
 use MySQLAdapters;
+use DateTime;
 
 class Getting implements Core\ConfirmationCode\Ports\Getting
 {
@@ -20,10 +21,11 @@ class Getting implements Core\ConfirmationCode\Ports\Getting
 
     return new MySQLAdapters\ConfirmationCode\Mappers\Entity(
       $code['id'],
-      new MySQLAdapters\Common\Mappers\ValueObjects\Email($code['email']),
-      (int) $code['created'],
+      new DateTime($code['created']),
+      (int) $code['created_time'],
       (int) $code['code'],
       (bool) $code['confirmed'],
+      new MySQLAdapters\Common\Mappers\ValueObjects\Email($code['email'])
     );
   }
 }

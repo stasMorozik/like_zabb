@@ -12,9 +12,9 @@ class MapperEntity extends Core\Role\Entity {
   )
   {
     parent::__construct(
-      Uuid::uuid4()->toString(), 
-      Core\Role\ValueObjects\Name::new($name), 
-      new DateTime()
+      Uuid::uuid4()->toString(),
+      new DateTime(),
+      Core\Role\ValueObjects\Name::new(['name' => $name])
     );
   }
 }

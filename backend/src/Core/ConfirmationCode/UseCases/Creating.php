@@ -7,10 +7,10 @@ use Core;
 /**
  *
  * Creating Use Case
- *  
+ *
 **/
 
-class Creating 
+class Creating
 {
   private Core\ConfirmationCode\Ports\Changing $_creating_port;
   private Core\ConfirmationCode\Ports\Getting $_getting_port;
@@ -27,12 +27,14 @@ class Creating
     $this->_notifying_port = $notifying_port;
   }
 
-  public function create(
-    ?string $email
-  ): Core\Common\Errors\Domain | Core\Common\Errors\InfraStructure | bool
+  public function create(array $args): Core\Common\Errors\Domain | Core\Common\Errors\InfraStructure | bool
   {
+    if (!isset($args['email'])) {
+      return new Core\Common\Errors\Domain('Invalid arguments');
+    }
+
     //Validate email address
-    $maybe_email = Core\Common\ValueObjects\Email::new($email);
+    $maybe_email = Core\Common\ValueObjects\Email::new(['email' => $args['email']]);
     if ($maybe_email instanceof Core\Common\Errors\Domain) {
       return $maybe_email;
     }
@@ -53,7 +55,7 @@ class Creating
       }
     }
 
-    $maybe_code = Core\ConfirmationCode\Entity::new($maybe_email);
+    $maybe_code = Core\ConfirmationCode\Entity::new(['email' => $maybe_email]);
 
     $maybe_true = $this->_creating_port->change($maybe_code);
     if ($maybe_true instanceof Core\Common\Errors\InfraStructure) {

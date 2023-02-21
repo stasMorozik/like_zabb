@@ -29,15 +29,15 @@ class ConfirmingTest extends TestCase
 
   public function testConfirm(): void
   {
-    $maybe_email = Core\Common\ValueObjects\Email::new(self::$email);
-    $code = Core\ConfirmationCode\Entity::new($maybe_email);
+    $maybe_email = Core\Common\ValueObjects\Email::new(['email' => self::$email]);
+    $code = Core\ConfirmationCode\Entity::new(['email' => $maybe_email]);
     $maybe_true = self::$creating_code_adapter->change($code);
-    
+
     if ($maybe_true === true) {
       $maybe_code = self::$confirming_code_adapter->change(
         $code
       );
-      
+
       $this->assertSame(
         true,
         $maybe_code
@@ -47,13 +47,13 @@ class ConfirmingTest extends TestCase
 
   public function testCodeNotFound(): void
   {
-    $maybe_email = Core\Common\ValueObjects\Email::new(self::$email);
-    $code = Core\ConfirmationCode\Entity::new($maybe_email);
-    
+    $maybe_email = Core\Common\ValueObjects\Email::new(['email' => self::$email]);
+    $code = Core\ConfirmationCode\Entity::new(['email' => $maybe_email]);
+
     $maybe_code = self::$confirming_code_adapter->change(
       $code
     );
-    
+
     $this->assertInstanceOf(
       Core\Common\Errors\InfraStructure::class,
       $maybe_code

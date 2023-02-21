@@ -30,12 +30,17 @@ class Authentication
     $this->_getting_port = $getting_port;
   }
 
-  public function auth(
-    ?string $email,
-    ?string $password
-  ): Core\Common\Errors\Domain | Core\Common\Errors\InfraStructure | Core\Session\Entity
+  public function auth(array $args): Core\Common\Errors\Domain | Core\Common\Errors\InfraStructure | Core\Session\Entity
   {
-    $maybe_email = Core\Common\ValueObjects\Email::new($email);
+    $keys = ['email', 'password'];
+
+    foreach ($keys as &$k) {
+      if (!isset($args[$k])) {
+        return new Core\Common\Errors\Domain('Invalid arguments');
+      }
+    }
+
+    $maybe_email = Core\Common\ValueObjects\Email::new(['email' => $args['email']]);
 
     if ($maybe_email instanceof Core\Common\Errors\Domain) {
       return $maybe_email;
@@ -46,11 +51,18 @@ class Authentication
       return $maybe_user;
     }
 
-    $maybe_true = $maybe_user->validatePassword($password, $this->_password_salt);
+    $maybe_true = $maybe_user->validatePassword([
+      'password' => $args['password'],
+      'salt' => $this->_password_salt
+    ]);
     if ($maybe_true instanceof Core\Common\Errors\Domain) {
       return $maybe_true;
     }
 
-    return new Core\Session\Entity($this->_access_token_salt, $this->_refresh_token_salt, $maybe_user->getId());
+    return Core\Session\Entity::new([
+      'access_token_salt' => $this->_access_token_salt,
+      'refresh_token_salt' => $this->_refresh_token_salt,
+      'id' => $maybe_user->getId()
+    ]);
   }
 }

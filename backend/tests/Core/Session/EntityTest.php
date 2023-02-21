@@ -12,13 +12,16 @@ class EntityTest extends TestCase
 
   public function testEncodeSession(): void
   {
-    $session = new Core\Session\Entity(
-      self::$access_token_salt,
-      self::$refresh_token_salt,
-      'id'
-    );
+    $session = Core\Session\Entity::new([
+      'access_token_salt' => self::$access_token_salt,
+      'refresh_token_salt' => self::$refresh_token_salt,
+      'id' => 'id'
+    ]);
 
-    $maybe_id = Core\Session\Entity::decode(self::$access_token_salt, $session->access_token);
+    $maybe_id = Core\Session\Entity::decode([
+      'access_token_salt' => self::$access_token_salt,
+      'access_token' => $session->getAccessToken()
+    ]);
 
     $this->assertSame(
       'id',
@@ -28,13 +31,17 @@ class EntityTest extends TestCase
 
   public function testRefreshSession(): void
   {
-    $session = new Core\Session\Entity(
-      self::$access_token_salt,
-      self::$refresh_token_salt,
-      'id'
-    );
+    $session = Core\Session\Entity::new([
+      'access_token_salt' => self::$access_token_salt,
+      'refresh_token_salt' => self::$refresh_token_salt,
+      'id' => 'id'
+    ]);
 
-    $maybe_session = Core\Session\Entity::refresh(self::$access_token_salt, self::$refresh_token_salt, $session->refresh_token);
+    $maybe_session = Core\Session\Entity::refresh([
+      'access_token_salt' => self::$access_token_salt,
+      'refresh_token_salt' => self::$refresh_token_salt,
+      'refresh_token' => $session->getRefreshToken()
+    ]);
 
     $this->assertInstanceOf(
       Core\Session\Entity::class,

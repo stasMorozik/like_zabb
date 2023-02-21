@@ -8,37 +8,46 @@ use Tests;
 
 class AuthenticationTest extends TestCase
 {
-  protected $users = [];
-  protected $password_salt = 'some_secret';
-  protected $access_token_salt = 'some_secret?';
-  protected $refresh_token_salt = 'some_secret?';
-  protected $authentication_use_case;
-  protected $getting_user_adapter;
-  protected $email = 'name@gmail.com';
-  protected $password = '12345';
+  protected static $users = [];
+  protected static $password_salt = 'some_secret';
+  protected static $access_token_salt = 'some_secret?';
+  protected static $refresh_token_salt = 'some_secret?';
+  protected static $authentication_use_case;
+  protected static $getting_user_adapter;
+  protected static $email = 'name@gmail.com';
+  protected static $password = '12345';
 
   protected function setUp(): void
   {
-    $this->getting_user_adapter = new Tests\Core\User\Adapters\Getting($this->users);
+    self::$getting_user_adapter = new Tests\Core\User\Adapters\Getting(self::$users);
 
-    $this->authentication_use_case = new Core\User\UseCases\Authentication(
-      $this->password_salt,
-      $this->access_token_salt,
-      $this->refresh_token_salt,
-      $this->getting_user_adapter
+    self::$authentication_use_case = new Core\User\UseCases\Authentication(
+      self::$password_salt,
+      self::$access_token_salt,
+      self::$refresh_token_salt,
+      self::$getting_user_adapter
     );
 
-    $maybe_email = Core\Common\ValueObjects\Email::new($this->email);
-    $code = Core\ConfirmationCode\Entity::new($maybe_email);
-    $account = Core\Account\Entity::new($code);
-    $role = Core\Role\Entity::new(Core\Role\ValueObjects\Name::ADMIN);
-    $user = Core\User\Entity::new($account, $role, $maybe_email, $this->password_salt, 'Joe', $this->password);
-    $this->users[$this->email] = $user;
+    $maybe_email = Core\Common\ValueObjects\Email::new(['email' => self::$email]);
+    $code = Core\ConfirmationCode\Entity::new(['email' => $maybe_email]);
+    $account = Core\Account\Entity::new(['code' => $code]);
+    $role = Core\Role\Entity::new(['name' => Core\Role\ValueObjects\Name::ADMIN]);
+
+    $user = Core\User\Entity::new([
+      'account' => $account,
+      'role' => $role,
+      'email' => $maybe_email,
+      'salt' => self::$password_salt,
+      'name' => 'Joe',
+      'password' => self::$password
+    ]);
+
+    self::$users[self::$email] = $user;
   }
 
   public function testAuthentication()
   {
-    $maybe_session = $this->authentication_use_case->auth($this->email, $this->password);
+    $maybe_session = self::$authentication_use_case->auth(['email' => self::$email, 'password' => self::$password]);
 
     $this->assertInstanceOf(
       Core\Session\Entity::class,
@@ -48,7 +57,7 @@ class AuthenticationTest extends TestCase
 
   public function testWrongPassword()
   {
-    $maybe_session = $this->authentication_use_case->auth($this->email, '123');
+    $maybe_session = self::$authentication_use_case->auth(['email' => self::$email, 'password' => '123']);
 
     $this->assertInstanceOf(
       Core\Common\Errors\Domain::class,
@@ -58,7 +67,7 @@ class AuthenticationTest extends TestCase
 
   public function testInvalidEmail()
   {
-    $maybe_session = $this->authentication_use_case->auth('nam1', '123');
+    $maybe_session = self::$authentication_use_case->auth(['email' => 'nam1', 'password' => '123']);
 
     $this->assertInstanceOf(
       Core\Common\Errors\Domain::class,
@@ -68,7 +77,7 @@ class AuthenticationTest extends TestCase
 
   public function testUserNotFound()
   {
-    $maybe_session = $this->authentication_use_case->auth('name1@gmail.com', '123');
+    $maybe_session = self::$authentication_use_case->auth(['email' => 'name1@gmail.com', 'password' => '123']);
 
     $this->assertInstanceOf(
       Core\Common\Errors\Infrastructure::class,

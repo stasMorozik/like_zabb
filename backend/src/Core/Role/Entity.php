@@ -9,46 +9,31 @@ use Ramsey\Uuid\Uuid;
 /**
  *
  * Entity Role
- *  
+ *
 **/
 
-class Entity 
+class Entity extends Core\Common\Entity
 {
-  protected string $id;
   protected Core\Role\ValueObjects\Name $name;
-  protected DateTime $created;
 
   protected function __construct(
     string $id,
-    Core\Role\ValueObjects\Name $name,
-    DateTime $created
+    DateTime $created,
+    Core\Role\ValueObjects\Name $name
   )
   {
-    $this->id = $id;
     $this->name = $name;
-    $this->created = $created;
+    parent::__construct($id, $created);
   }
 
-  public function getId(): string 
-  {
-    return $this->id;
-  }
-
-  public function getName(): Core\Role\ValueObjects\Name 
+  public function getName(): Core\Role\ValueObjects\Name
   {
     return $this->name;
   }
 
-  public function getCreated(): DateTime
+  public static function new(array $args): Core\Common\Errors\Domain | Entity
   {
-    return $this->created;
-  }
-
-  public static function new(
-    ?string $name
-  ): Core\Common\Errors\Domain | Entity
-  {
-    $maybe_name = Core\Role\ValueObjects\Name::new($name);
+    $maybe_name = Core\Role\ValueObjects\Name::new($args);
 
     if ($maybe_name instanceof Core\Common\Errors\Domain) {
       return $maybe_name;
@@ -56,8 +41,8 @@ class Entity
 
     return new Entity(
       Uuid::uuid4()->toString(),
-      $maybe_name,
-      new DateTime()
+      new DateTime(),
+      $maybe_name
     );
   }
 }

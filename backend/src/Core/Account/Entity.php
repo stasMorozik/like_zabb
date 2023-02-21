@@ -9,48 +9,42 @@ use Ramsey\Uuid\Uuid;
 /**
  *
  * Entity Account
- *  
+ *
 **/
 
-class Entity {
-  protected string $id;
+class Entity extends Core\Common\Entity
+{
   protected Core\Common\ValueObjects\Email $email;
-  protected DateTime $created;
 
   protected function __construct(
     string $id,
-    Core\Common\ValueObjects\Email $email,
-    DateTime $created
+    DateTime $created,
+    Core\Common\ValueObjects\Email $email
   )
   {
-    $this->id = $id;
     $this->email = $email;
-    $this->created = $created;
+    parent::__construct($id, $created);
   }
 
-  public function getId(): string
-  {
-    return $this->id;
-  }
-
-  public function getEmail(): Core\Common\ValueObjects\Email 
+  public function getEmail(): Core\Common\ValueObjects\Email
   {
     return $this->email;
   }
 
-  public function getCreated(): DateTime
+  public static function new(array $args): Entity
   {
-    return $this->created;
-  }
+    if (!isset($args['code'])) {
+      return new Core\Common\Errors\Domain('Invalid argument');
+    }
 
-  public static function new(
-    Core\ConfirmationCode\Entity $code
-  ): Entity
-  {
+    if (($args['code'] instanceof Core\ConfirmationCode\Entity) == false) {
+      return new Core\Common\Errors\Domain('Invalid code');
+    }
+
     return new Entity(
       Uuid::uuid4()->toString(),
-      $code->getEmail(),
-      new DateTime()
+      new DateTime(),
+      $args['code']->getEmail()
     );
   }
 }

@@ -19,8 +19,8 @@ class Getting implements Core\Role\Ports\Getting
 
     return new MySQLAdapters\Role\Mappers\Entity(
       $role['id'],
-      new MySQLAdapters\Role\Mappers\ValueObjects\Name($role['name']),
-      new DateTime($role['created'])
+      new DateTime($role['created']),
+      new MySQLAdapters\Role\Mappers\ValueObjects\Name($role['name'])
     );
   }
 }

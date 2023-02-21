@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class Controller extends AbstractController
 {
-  #[Route('/user/authenticate', name: 'authenticate', methods: 'POST')]
+  #[Route('/user/auth', name: 'authenticate', methods: 'POST')]
   public function authenticate(
     Apps\RestApi\User\Services\Authentication $_authentication_service,
     Request $request
@@ -19,9 +19,10 @@ class Controller extends AbstractController
   {
     $params = json_decode($request->getContent());
 
-    return $_authentication_service->auth(
-      $params->{'email'}, $params->{'password'}
-    );
+    return $_authentication_service->auth([
+      'email' => $params->{'email'},
+      'password' => $params->{'password'}
+    ]);
   }
 
   #[Route('/user', name: 'authorization', methods: 'GET')]
@@ -30,10 +31,8 @@ class Controller extends AbstractController
     Request $request
   ): JsonResponse
   {
-    $params = json_decode($request->getContent());
-
-    return $_authorization_service->auth(
-      isset($_SESSION["access_token"]) ? $_SESSION["access_token"] : ''
-    );
+    return $_authorization_service->auth([
+      'access_token' => isset($_SESSION["access_token"]) ? $_SESSION["access_token"] : ''
+    ]);
   }
 }

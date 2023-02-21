@@ -17,12 +17,12 @@ class Authorization
     $this->_authorization_use_case = $authorization_use_case;
   }
 
-  public function auth(?string $access_token)
+  public function auth(array $args)
   {
     $resp = new JsonResponse();
 
     try {
-      $result = $this->_authorization_use_case->auth($access_token);
+      $result = $this->_authorization_use_case->auth($args);
 
       if (($result instanceof Core\User\Entity) == false) {
         return $resp->setStatusCode(400)->setData(["message" => $result->getMessage()]);

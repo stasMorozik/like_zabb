@@ -33,15 +33,23 @@ class CreatingTest extends TestCase
 
   public function testCreate(): void
   {
-    $maybe_email = Core\Common\ValueObjects\Email::new(self::$email);
-    $code = Core\ConfirmationCode\Entity::new($maybe_email);
-    $account = Core\Account\Entity::new($code);
+    $maybe_email = Core\Common\ValueObjects\Email::new(['email' => self::$email]);
+    $code = Core\ConfirmationCode\Entity::new(['email' => $maybe_email]);
+    $account = Core\Account\Entity::new(['code' => $code]);
     $role = self::$getting_role_adapter->get(
       new MySQLAdapters\Role\Mappers\ValueObjects\Name(
         Core\Role\ValueObjects\Name::ADMIN
       )
     );
-    $user = Core\User\Entity::new($account, $role, $maybe_email, self::$salt, 'Joe', '12345');
+
+    $user = Core\User\Entity::new([
+      'account' => $account,
+      'role' => $role,
+      'email' => $maybe_email,
+      'salt' => self::$salt,
+      'name' => 'Joe',
+      'password' => '12345'
+    ]);
 
     $maybe_true = self::$creating_account_adapter->change(
       $user
@@ -55,15 +63,22 @@ class CreatingTest extends TestCase
 
   public function testAlreadyExists(): void
   {
-    $maybe_email = Core\Common\ValueObjects\Email::new(self::$email);
-    $code = Core\ConfirmationCode\Entity::new($maybe_email);
-    $account = Core\Account\Entity::new($code);
+    $maybe_email = Core\Common\ValueObjects\Email::new(['email' => self::$email]);
+    $code = Core\ConfirmationCode\Entity::new(['email' => $maybe_email]);
+    $account = Core\Account\Entity::new(['code' => $code]);
     $role = self::$getting_role_adapter->get(
       new MySQLAdapters\Role\Mappers\ValueObjects\Name(
         Core\Role\ValueObjects\Name::ADMIN
       )
     );
-    $user = Core\User\Entity::new($account, $role, $maybe_email, self::$salt, 'Joe', '12345');
+    $user = Core\User\Entity::new([
+      'account' => $account,
+      'role' => $role,
+      'email' => $maybe_email,
+      'salt' => self::$salt,
+      'name' => 'Joe',
+      'password' => '12345'
+    ]);
 
     $maybe_true = self::$creating_account_adapter->change(
       $user

@@ -5,7 +5,7 @@ namespace MySQLAdapters\ConfirmationCode;
 use DB;
 use Core;
 
-class Creating implements Core\ConfirmationCode\Ports\Changing 
+class Creating implements Core\ConfirmationCode\Ports\Changing
 {
   public function change(Core\ConfirmationCode\Entity $entity): Core\Common\Errors\InfraStructure | bool
   {
@@ -17,6 +17,7 @@ class Creating implements Core\ConfirmationCode\Ports\Changing
       'id' => $entity->getId(),
       'email' => $entity->getEmail()->getValue(),
       'created' => $entity->getCreated(),
+      'created_time' => $entity->getCreatedTime(),
       'code' => $entity->getCode(),
       'confirmed' => $entity->getConfirmed(),
     ]);

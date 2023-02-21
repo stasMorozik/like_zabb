@@ -17,12 +17,12 @@ class Refreshing
     $this->_refreshing_use_case = $refreshing_use_case;
   }
 
-  public function auth(?string $refresh_token)
+  public function auth(array $args)
   {
     $resp = new JsonResponse();
 
     try {
-      $result = $this->_refreshing_use_case->refresh($refresh_token);
+      $result = $this->_refreshing_use_case->refresh($args);
 
       if (($result instanceof Core\Session\Entity) == false) {
         return $resp->setStatusCode(400)->setData(["message" => $result->getMessage()]);
@@ -30,8 +30,8 @@ class Refreshing
 
       session_start();
 
-      $_SESSION["access_token"] = $result->access_token;
-      $_SESSION["refresh_token"] = $result->refresh_token;
+      $_SESSION["access_token"] = $result->getAccessToken();
+      $_SESSION["refresh_token"] = $result->getRefreshToken();
 
       return $resp->setStatusCode(200)->setData(true);
 

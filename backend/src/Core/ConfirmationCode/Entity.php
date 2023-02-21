@@ -3,55 +3,51 @@
 namespace Core\ConfirmationCode;
 
 use Core;
+use DateTime;
 use Ramsey\Uuid\Uuid;
 
 /**
  *
  * Entity Confirmation Code
- *  
+ *
 **/
 
-class Entity 
+class Entity extends Core\Common\Entity
 {
-  protected string $id;
   protected Core\Common\ValueObjects\Email $email;
-  protected int $created;
+  protected int $created_time;
   protected int $code;
   protected bool $confirmed;
 
   protected function __construct(
     string $id,
-    Core\Common\ValueObjects\Email $email,
-    int $created,
+    DateTime $created,
+    int $created_time,
     int $code,
-    bool $confirmed
+    bool $confirmed,
+    Core\Common\ValueObjects\Email $email
   )
   {
-    $this->id = $id;
     $this->email = $email;
-    $this->created = $created;
+    $this->created_time = $created_time;
     $this->code = $code;
     $this->confirmed = $confirmed;
+    parent::__construct($id, $created);
   }
 
-  public function getId(): string 
-  {
-    return $this->id;
-  }
-
-  public function getEmail(): Core\Common\ValueObjects\Email 
+  public function getEmail(): Core\Common\ValueObjects\Email
   {
     return $this->email;
   }
 
-  public function getCode(): int 
+  public function getCode(): int
   {
     return $this->code;
   }
 
-  public function getCreated(): int 
+  public function getCreatedTime(): int
   {
-    return $this->created;
+    return $this->created_time;
   }
 
   public function getConfirmed(): bool
@@ -68,23 +64,30 @@ class Entity
     return true;
   }
 
-  public static function new(
-    Core\Common\ValueObjects\Email $email
-  ): Entity 
+  public static function new(array $args): Entity
   {
+    if (!isset($args['email'])) {
+      return new Core\Common\Errors\Domain('Invalid argument');
+    }
+
+    if (($args['email'] instanceof Core\Common\ValueObjects\Email) == false) {
+      return new Core\Common\Errors\Domain('Invalid code');
+    }
+
     return new Entity(
       Uuid::uuid4()->toString(),
-      $email,
+      new DateTime(),
       time() + 900,
       rand(1000, 9999),
-      false
+      false,
+      $args['email']
     );
   }
 
   //Validate code lifetime
   private function validateLifetime(): Core\Common\Errors\Domain | bool
   {
-    if (time() >= $this->created) {
+    if (time() >= $this->created_time) {
       return new Core\Common\Errors\Domain('Invalid code expiration time');
     }
 
@@ -92,7 +95,7 @@ class Entity
   }
 
   //Validate code
-  private function validateCode(int $code): Core\Common\Errors\Domain | bool
+  private function validateCode(?int $code): Core\Common\Errors\Domain | bool
   {
     if ($code != $this->code) {
       return new Core\Common\Errors\Domain('Wrong code');
@@ -118,7 +121,7 @@ class Entity
     return true;
   }
 
-  public function checkLifetime(): Core\Common\Errors\Domain | bool 
+  public function checkLifetime(): Core\Common\Errors\Domain | bool
   {
     if ($this->validateLifetime() === true) {
       return new Core\Common\Errors\Domain('You already have a confirmation code');

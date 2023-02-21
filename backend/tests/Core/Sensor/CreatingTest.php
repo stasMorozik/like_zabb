@@ -8,60 +8,68 @@ use Tests;
 
 class CreatingTest extends TestCase
 {
-  protected $users = [];
-  protected $password_salt = 'some_secret';
-  protected $access_token_salt = 'some_secret?';
-  protected $refresh_token_salt = 'some_secret?';
-  protected $authorization_use_case;
-  protected $getting_user_adapter;
-  protected $email = 'name@gmail.com';
-  protected $password = '12345';
-  protected $session;
+  protected static $users = [];
+  protected static $password_salt = 'some_secret';
+  protected static $access_token_salt = 'some_secret?';
+  protected static $refresh_token_salt = 'some_secret?';
+  protected static $authorization_use_case;
+  protected static $getting_user_adapter;
+  protected static $email = 'name@gmail.com';
+  protected static $password = '12345';
+  protected static $session;
 
-  protected $sensors = [];
-  protected $creating_sensor_adapter;
-  protected $creating_sensor_use_case;
+  protected static $sensors = [];
+  protected static $creating_sensor_adapter;
+  protected static $creating_sensor_use_case;
 
   protected function setUp(): void
   {
-    $this->getting_user_adapter = new Tests\Core\User\Adapters\GettingById($this->users);
+    self::$getting_user_adapter = new Tests\Core\User\Adapters\GettingById(self::$users);
 
-    $this->authorization_use_case = new Core\User\UseCases\Authorization(
-      $this->access_token_salt,
-      $this->getting_user_adapter
+    self::$authorization_use_case = new Core\User\UseCases\Authorization(
+      self::$access_token_salt,
+      self::$getting_user_adapter
     );
 
-    $maybe_email = Core\Common\ValueObjects\Email::new($this->email);
-    $code = Core\ConfirmationCode\Entity::new($maybe_email);
-    $account = Core\Account\Entity::new($code);
-    $role = Core\Role\Entity::new(Core\Role\ValueObjects\Name::ADMIN);
-    $user = Core\User\Entity::new($account, $role, $maybe_email, $this->password_salt, 'Joe', $this->password);
+    $maybe_email = Core\Common\ValueObjects\Email::new(['email' => self::$email]);
+    $code = Core\ConfirmationCode\Entity::new(['email' => $maybe_email]);
+    $account = Core\Account\Entity::new(['code' => $code]);
+    $role = Core\Role\Entity::new(['name' => Core\Role\ValueObjects\Name::ADMIN]);
 
-    $this->session = new Core\Session\Entity(
-      $this->access_token_salt,
-      $this->refresh_token_salt,
-      $user->getId()
-    );
+    $user = Core\User\Entity::new([
+      'account' => $account,
+      'role' => $role,
+      'email' => $maybe_email,
+      'salt' => self::$password_salt,
+      'name' => 'Joe',
+      'password' => '12345'
+    ]);
 
-    $this->users[$user->getId()] = $user;
+    self::$session = Core\Session\Entity::new([
+      'access_token_salt' => self::$access_token_salt,
+      'refresh_token_salt' => self::$refresh_token_salt,
+      'id' => $user->getId()
+    ]);
 
-    $this->creating_sensor_adapter = new Tests\Core\Sensor\Adapters\Creating($this->sensors);
-    $this->creating_sensor_use_case = new Core\Sensor\UseCases\Creating(
-      $this->creating_sensor_adapter,
-      $this->authorization_use_case
+    self::$users[$user->getId()] = $user;
+
+    self::$creating_sensor_adapter = new Tests\Core\Sensor\Adapters\Creating(self::$sensors);
+    self::$creating_sensor_use_case = new Core\Sensor\UseCases\Creating(
+      self::$creating_sensor_adapter,
+      self::$authorization_use_case
     );
   }
 
   public function testCreate()
   {
-    $maybe_true = $this->creating_sensor_use_case->create(
-      'EXAMPLE-891_98',
-      167.3,
-      64.6,
-      Core\Sensor\ValueObjects\Status::NOT_AVAILABLE,
-      'Example',
-      $this->session->access_token
-    );
+    $maybe_true = self::$creating_sensor_use_case->create([
+      'name' => 'EXAMPLE-891_98',
+      'longitude' => 167.3,
+      'latitude' => 64.6,
+      'status' => Core\Sensor\ValueObjects\Status::NOT_AVAILABLE,
+      'description' => 'Example',
+      'access_token' => self::$session->getAccessToken()
+    ]);
 
     $this->assertSame(
       true,
@@ -71,14 +79,14 @@ class CreatingTest extends TestCase
 
   public function testInvalidToken()
   {
-    $maybe_true = $this->creating_sensor_use_case->create(
-      'EXAMPLE-891_98',
-      167.3,
-      64.6,
-      Core\Sensor\ValueObjects\Status::NOT_AVAILABLE,
-      'Example',
-      'Invalid token'
-    );
+    $maybe_true = self::$creating_sensor_use_case->create([
+      'name' => 'EXAMPLE-891_98',
+      'longitude' => 167.3,
+      'latitude' => 64.6,
+      'status' => Core\Sensor\ValueObjects\Status::NOT_AVAILABLE,
+      'description' => 'Example',
+      'access_token' => 'Invalid token'
+    ]);
 
     $this->assertInstanceOf(
       Core\Common\Errors\Domain::class,
@@ -88,14 +96,14 @@ class CreatingTest extends TestCase
 
   public function testInvalidName()
   {
-    $maybe_true = $this->creating_sensor_use_case->create(
-      'EXAMPLE-891_98?',
-      167.3,
-      64.6,
-      Core\Sensor\ValueObjects\Status::NOT_AVAILABLE,
-      'Example',
-      $this->session->access_token
-    );
+    $maybe_true = self::$creating_sensor_use_case->create([
+      'name' => 'EXAMPLE-891_98?',
+      'longitude' => 167.3,
+      'latitude' => 64.6,
+      'status' => Core\Sensor\ValueObjects\Status::NOT_AVAILABLE,
+      'description' => 'Example',
+      'access_token' => self::$session->getAccessToken()
+    ]);
 
     $this->assertInstanceOf(
       Core\Common\Errors\Domain::class,

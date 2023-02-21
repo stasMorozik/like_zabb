@@ -17,14 +17,12 @@ class Creating
     $this->_creating_use_case = $creating_use_case;
   }
 
-  public function create(
-    ?string $email
-  ): JsonResponse
+  public function create(array $args): JsonResponse
   {
     $resp = new JsonResponse();
 
     try {
-      $result = $this->_creating_use_case->create($email);
+      $result = $this->_creating_use_case->create($args);
 
       if ($result !== true) {
         return $resp->setStatusCode(400)->setData(["message" => $result->getMessage()]);

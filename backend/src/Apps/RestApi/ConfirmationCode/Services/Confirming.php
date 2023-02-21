@@ -17,15 +17,12 @@ class Confirming
     $this->_confirming_use_case = $confirming_use_case;
   }
 
-  public function confirm(
-    ?string $email,
-    ?int $code
-  ): JsonResponse
+  public function confirm(array $args): JsonResponse
   {
     $resp = new JsonResponse();
 
     try {
-      $result = $this->_confirming_use_case->confirm($email, $code);
+      $result = $this->_confirming_use_case->confirm($args);
 
       if ($result !== true) {
         return $resp->setStatusCode(400)->setData(["message" => $result->getMessage()]);

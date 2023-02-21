@@ -9,11 +9,11 @@ class RefreshingTest extends TestCase
 {
   protected static $access_token_salt = 'some_secret';
   protected static $refresh_token_salt = 'some_secret?';
-  protected $refreshing_use_case;
+  protected static $refreshing_use_case;
 
   protected function setUp(): void
   {
-    $this->refreshing_use_case = new Core\Session\UseCases\Refreshing(
+    self::$refreshing_use_case = new Core\Session\UseCases\Refreshing(
       self::$access_token_salt,
       self::$refresh_token_salt
     );
@@ -21,13 +21,13 @@ class RefreshingTest extends TestCase
 
   public function testRefresh(): void
   {
-    $session = new Core\Session\Entity(
-      self::$access_token_salt,
-      self::$refresh_token_salt,
-      'id'
-    );
+    $session = Core\Session\Entity::new([
+      'access_token_salt' => self::$access_token_salt,
+      'refresh_token_salt' => self::$refresh_token_salt,
+      'id' => 'id'
+    ]);
 
-    $maybe_session = $this->refreshing_use_case->refresh($session->refresh_token);
+    $maybe_session = self::$refreshing_use_case->refresh(['refresh_token' => $session->getRefreshToken()]);
 
     $this->assertInstanceOf(
       Core\Session\Entity::class,
@@ -37,7 +37,7 @@ class RefreshingTest extends TestCase
 
   public function testInvalidToken(): void
   {
-    $maybe_session = $this->refreshing_use_case->refresh('invalid token');
+    $maybe_session = self::$refreshing_use_case->refresh(['refresh_token' => 'invalid token']);
 
     $this->assertInstanceOf(
       Core\Common\Errors\Domain::class,

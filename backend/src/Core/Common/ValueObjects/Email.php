@@ -10,23 +10,23 @@ use Core;
  *
 **/
 
-class Email extends Core\Common\ValueObjects\Common
+class Email extends Core\Common\ValueObjects\ValueObject
 {
   protected function __construct(string $email)
   {
     parent::__construct($email);
   }
 
-  public static function new(?string $email): Email | Core\Common\Errors\Domain
+  public static function new(array $args): Email | Core\Common\Errors\Domain
   {
-    if (!$email) {
+    if (!isset($args['email'])) {
+      return new Core\Common\Errors\Domain('Invalid argument');
+    }
+
+    if (!filter_var($args['email'], FILTER_VALIDATE_EMAIL)) {
       return new Core\Common\Errors\Domain('Invalid email');
     }
 
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-      return new Core\Common\Errors\Domain('Invalid email');
-    }
-
-    return new Email($email);
+    return new Email($args['email']);
   }
 }

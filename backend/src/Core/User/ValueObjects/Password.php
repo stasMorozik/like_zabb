@@ -10,37 +10,41 @@ use Core;
  *
 **/
 
-class Password extends Core\Common\ValueObjects\Common
+class Password extends Core\Common\ValueObjects\ValueObject
 {
   protected function __construct(string $password)
   {
     parent::__construct($password);
   }
 
-  public static function new(?string $password, string $salt): Password | Core\Common\Errors\Domain
+  public static function new(array $args): Password | Core\Common\Errors\Domain
   {
-    if (!$password) {
+    if (!isset($args['password']) || !isset($args['salt'])) {
+      return new Core\Common\Errors\Domain('Invalid argument');
+    }
+
+    if(preg_match("/[А-я,Ё,ё]/", $args['password'])) {
       return new Core\Common\Errors\Domain('Invalid password');
     }
 
-    if(preg_match("/[А-я,Ё,ё]/", $password)) {
+    if (mb_strlen($args['password'], 'UTF-8') > 10) {
       return new Core\Common\Errors\Domain('Invalid password');
     }
 
-    if (mb_strlen($password, 'UTF-8') > 10) {
+    if (mb_strlen($args['password'], 'UTF-8') < 5) {
       return new Core\Common\Errors\Domain('Invalid password');
     }
 
-    if (mb_strlen($password, 'UTF-8') < 5) {
-      return new Core\Common\Errors\Domain('Invalid password');
-    }
-
-    return new Password(crypt($password, $salt));
+    return new Password(crypt($args['password'], $args['salt']));
   }
 
-  public function validate(string $password, string $salt): Core\Common\Errors\Domain | bool
+  public function validate(array $args): Core\Common\Errors\Domain | bool
   {
-    if (!hash_equals($this->value, crypt($password, $salt))) {
+    if (!isset($args['password']) || !isset($args['salt'])) {
+      return new Core\Common\Errors\Domain('Invalid argument');
+    }
+
+    if (!hash_equals($this->getValue(), crypt($args['password'], $args['salt']))) {
       return new Core\Common\Errors\Domain('Wrong password');
     }
 

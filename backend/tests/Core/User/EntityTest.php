@@ -12,11 +12,19 @@ class EntityTest extends TestCase
 
   public function testNewUser(): void
   {
-    $maybe_email = Core\Common\ValueObjects\Email::new(self::$email);
-    $code = Core\ConfirmationCode\Entity::new($maybe_email);
-    $account = Core\Account\Entity::new($code);
-    $role = Core\Role\Entity::new(Core\Role\ValueObjects\Name::ADMIN);
-    $user = Core\User\Entity::new($account, $role, $maybe_email, self::$salt, 'Joe', '12345');
+    $maybe_email = Core\Common\ValueObjects\Email::new(['email' => self::$email]);
+    $code = Core\ConfirmationCode\Entity::new(['email' => $maybe_email]);
+    $account = Core\Account\Entity::new(['code' => $code]);
+    $role = Core\Role\Entity::new(['name' => Core\Role\ValueObjects\Name::ADMIN]);
+
+    $user = Core\User\Entity::new([
+      'account' => $account,
+      'role' => $role,
+      'email' => $maybe_email,
+      'salt' => self::$salt,
+      'name' => 'Joe',
+      'password' => '12345'
+    ]);
 
     $this->assertInstanceOf(
       Core\User\Entity::class,
@@ -26,11 +34,18 @@ class EntityTest extends TestCase
 
   public function testInvalidName(): void
   {
-    $maybe_email = Core\Common\ValueObjects\Email::new(self::$email);
-    $code = Core\ConfirmationCode\Entity::new($maybe_email);
-    $account = Core\Account\Entity::new($code);
-    $role = Core\Role\Entity::new(Core\Role\ValueObjects\Name::ADMIN);
-    $user = Core\User\Entity::new($account, $role, $maybe_email, self::$salt, 'Joe12', '12345');
+    $maybe_email = Core\Common\ValueObjects\Email::new(['email' => self::$email]);
+    $code = Core\ConfirmationCode\Entity::new(['email' => $maybe_email]);
+    $account = Core\Account\Entity::new(['code' => $code]);
+    $role = Core\Role\Entity::new(['name' => Core\Role\ValueObjects\Name::ADMIN]);
+    $user = Core\User\Entity::new([
+      'account' => $account,
+      'role' => $role,
+      'email' => $maybe_email,
+      'salt' => self::$salt,
+      'name' => 'Joe12',
+      'password' => '12345'
+    ]);
 
     $this->assertInstanceOf(
       Core\Common\Errors\Domain::class,
