@@ -17,7 +17,7 @@ run_test_migration:
   docker run --rm --name zab_migration_test -v /projects/like_zabb/backend:/migration_test zab_migration_test
 
 build_tests:
-  docker build -f Dockerfile.test ./  -t like_zabb_back_test
+  docker build -f Dockerfile.test ./  -t zabb_back_test
 
 tests:
-  docker run --rm --name like_zabb_back_test -v /projects/like_zabb/backend:/tests like_zabb_back_test
+  docker run --rm --name zabb_back_test -v /projects/like_zabb/backend:/tests zabb_back_test
