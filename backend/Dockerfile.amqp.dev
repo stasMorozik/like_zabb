@@ -1,0 +1,10 @@
+FROM php:latest-cli
+FROM composer:latest
+
+WORKDIR /zab_amqp_app
+
+COPY . .
+
+RUN COMPOSER="composer.amqp.json" COMPOSER_VENDOR_DIR="/vendor" composer install
+
+CMD ["php", "-t", "./public", "./public/amqp/index.php"]

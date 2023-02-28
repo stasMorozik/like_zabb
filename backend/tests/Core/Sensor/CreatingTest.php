@@ -89,7 +89,7 @@ class CreatingTest extends TestCase
     ]);
 
     $this->assertInstanceOf(
-      Core\Common\Errors\Domain::class,
+      Core\Common\Errors\Unauthorized::class,
       $maybe_true
     );
   }

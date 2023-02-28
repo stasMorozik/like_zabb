@@ -1,0 +1,159 @@
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
+parameters:
+
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+    # makes classes in src/ available to be used as services
+    # this creates a service per class whose id is the fully-qualified class name
+    # RestApi\:
+    #     resource: './'
+    #     exclude:
+    #         - './Kernel.php'
+
+    #Common service
+
+    MySQLAdapters\DBFactory:
+        arguments:
+            $user: '%env(string:DB_USER)%'
+            $password: '%env(string:DB_PASSWORD)%'
+            $dbName: '%env(string:DB_NAME)%'
+            $host: '%env(string:DB_HOST)%'
+            $port: '%env(int:DB_PORT)%'
+
+    MySQLAdapters\Role\Getting:
+        arguments:
+
+
+    MySQLAdapters\ConfirmationCode\Getting:
+        arguments:
+
+    MySQLAdapters\ConfirmationCode\Creating:
+        arguments:
+
+    MySQLAdapters\ConfirmationCode\Confirming:
+        arguments:
+
+    MySQLAdapters\Account\Creating:
+        arguments:
+
+    MySQLAdapters\User\Getting:
+        arguments:
+
+    MySQLAdapters\User\GettingById:
+        arguments:
+
+    MySQLAdapters\Sensor\Creating:
+        arguments:
+
+    SMTPAdapters\Notifying:
+        arguments:
+            $url: '%env(string:SMTP_URL)%'
+            $port: '%env(int:SMTP_PORT)%'
+            $user: '%env(int:SMTP_USER)%'
+            $password: '%env(int:SMTP_PASSWORD)%'
+
+    Core\ConfirmationCode\UseCases\Creating:
+        arguments:
+            $creating_port: '@MySQLAdapters\ConfirmationCode\Creating'
+            $getting_port: '@MySQLAdapters\ConfirmationCode\Getting'
+            $notifying_port: '@SMTPAdapters\Notifying'
+
+    Core\ConfirmationCode\UseCases\Confirming:
+        arguments:
+            $updating_port: '@MySQLAdapters\ConfirmationCode\Confirming'
+            $getting_port: '@MySQLAdapters\ConfirmationCode\Getting'
+
+    Core\Account\UseCases\Creating:
+        arguments:
+            $salt: '%env(string:PASSWORD_SALT)%'
+            $creating_account_port: '@MySQLAdapters\Account\Creating'
+            $getting_confirmation_code_port: '@MySQLAdapters\ConfirmationCode\Getting'
+            $getting_role_port: '@MySQLAdapters\Role\Getting'
+
+    Core\User\UseCases\Authentication:
+        arguments:
+            $password_salt: '%env(string:PASSWORD_SALT)%'
+            $access_token_salt: '%env(string:ACCESS_TOKEN_SALT)%'
+            $refresh_token_salt: '%env(string:REFRESH_TOKEN_SALT)%'
+            $getting_port: '@MySQLAdapters\User\Getting'
+
+    Core\Session\UseCases\Refreshing:
+        arguments:
+            $access_token_salt: '%env(string:ACCESS_TOKEN_SALT)%'
+            $refresh_token_salt: '%env(string:REFRESH_TOKEN_SALT)%'
+
+    Core\User\UseCases\Authorization:
+        arguments:
+            $access_token_salt: '%env(string:ACCESS_TOKEN_SALT)%'
+            $getting_port: '@MySQLAdapters\User\GettingById'
+
+    Core\Sensor\UseCases\Creating:
+        arguments:
+            $creating_port: '@MySQLAdapters\Sensor\Creating'
+            $authorization_use_case: '@Core\User\UseCases\Authorization'
+
+    Apps\RestApi\Modules\Account\Services\Creating:
+        arguments:
+            $creating_use_case: '@Core\Account\UseCases\Creating'
+
+    Apps\RestApi\Modules\ConfirmationCode\Services\Confirming:
+        arguments:
+            $confirming_use_case: '@Core\ConfirmationCode\UseCases\Confirming'
+
+    Apps\RestApi\Modules\ConfirmationCode\Services\Creating:
+        arguments:
+            $creating_use_case: '@Core\ConfirmationCode\UseCases\Creating'
+
+    Apps\RestApi\Modules\User\Services\Authentication:
+        arguments:
+            $authentication_use_case: '@Core\User\UseCases\Authentication'
+
+    Apps\RestApi\Modules\Session\Services\Refreshing:
+        arguments:
+            $refreshing_use_case: '@Core\Session\UseCases\Refreshing'
+
+    Apps\RestApi\Modules\User\Services\Authorization:
+        arguments:
+            $authorization_use_case: '@Core\User\UseCases\Authorization'
+
+    Apps\RestApi\Modules\Sensor\Services\Creating:
+        arguments:
+            $creating_use_case: '@Core\Sensor\UseCases\Creating'
+
+    Apps\RestApi\Modules\User\Controllers\BaseController:
+        calls:
+            - method: setContainer
+              arguments: ['@service_container']
+
+    Apps\RestApi\Modules\Session\Controllers\BaseController:
+        calls:
+            - method: setContainer
+              arguments: ['@service_container']
+
+    Apps\RestApi\Modules\Sensor\Controllers\BaseController:
+        calls:
+            - method: setContainer
+              arguments: ['@service_container']
+
+    Apps\RestApi\Modules\ConfirmationCode\Controllers\BaseController:
+        calls:
+            - method: setContainer
+              arguments: ['@service_container']
+
+    Apps\RestApi\Modules\Account\Controllers\BaseController:
+        calls:
+            - method: setContainer
+              arguments: ['@service_container']
+
+    Apps\RestApi\Modules\Common\Controllers\ErrorController:
+        calls:
+            - method: setContainer
+              arguments: ['@service_container']

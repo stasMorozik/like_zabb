@@ -4,7 +4,7 @@ use Dotenv\Dotenv;
 
 require '../vendor/autoload.php';
 
-Dotenv::createUnsafeImmutable(__DIR__ . '/../', '.env')->load();
+Dotenv::createUnsafeImmutable(__DIR__ . '/../', '.env.rest')->load();
 
 DB::$user = $_ENV["DB_USER"];
 DB::$password = $_ENV["DB_PASSWORD"];
@@ -26,7 +26,7 @@ DB::query("DROP TABLE IF EXISTS sensors");
 DB::query("CREATE TABLE users(
   id BINARY(36) not null,
   name varchar(128) not null,
-  created date not null,
+  created datetime not null,
   email varchar(128) unique not null,
   password varchar(128) not null,
   primary key(id)
@@ -34,14 +34,14 @@ DB::query("CREATE TABLE users(
 
 DB::query("CREATE TABLE accounts(
   id BINARY(36) not null,
-  created date not null,
+  created datetime not null,
   email varchar(128) unique not null,
   primary key(id)
 )");
 
 DB::query("CREATE TABLE confirmation_codes(
   id BINARY(36) not null,
-  created date not null,
+  created datetime not null,
   created_time INT,
   email varchar(128) unique not null,
   code SMALLINT,
@@ -51,7 +51,7 @@ DB::query("CREATE TABLE confirmation_codes(
 
 DB::query("CREATE TABLE sensors(
   id BINARY(36) not null,
-  created date not null,
+  created datetime not null,
   name varchar(128) not null,
   longitude float not null,
   latitude float not null,
@@ -62,7 +62,7 @@ DB::query("CREATE TABLE sensors(
 
 DB::query("CREATE TABLE roles(
   id BINARY(36) not null,
-  created date not null,
+  created datetime not null,
   name varchar(128) unique not null,
   primary key(id)
 )");

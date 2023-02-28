@@ -1,8 +1,0 @@
-
-controllers:
-    resource: ../src/Apps/RestApi/
-    type: attribute
-
-kernel:
-    resource: ../src/Apps/RestApi/Kernel.php
-    type: attribute

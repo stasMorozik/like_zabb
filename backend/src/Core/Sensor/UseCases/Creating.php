@@ -24,7 +24,7 @@ class Creating
     $this->_authorization_use_case = $authorization_use_case;
   }
 
-  public function create(array $args): bool | Core\Common\Errors\InfraStructure | Core\Common\Errors\Domain
+  public function create(array $args): bool | Core\Common\Errors\InfraStructure | Core\Common\Errors\Domain | Core\Common\Errors\Unauthorized
   {
     $keys = ['name', 'longitude', 'latitude', 'status', 'description', 'access_token'];
 
@@ -37,7 +37,7 @@ class Creating
     $maybe_user = $this->_authorization_use_case->auth(['access_token' => $args['access_token']]);
 
     if (($maybe_user instanceof Core\User\Entity) == false) {
-      return $maybe_user;
+      return new Core\Common\Errors\Unauthorized($maybe_user->getMessage());
     }
 
     $maybe_sensor = Core\Sensor\Entity::new([

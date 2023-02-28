@@ -40,7 +40,7 @@ class RefreshingTest extends TestCase
     $maybe_session = self::$refreshing_use_case->refresh(['refresh_token' => 'invalid token']);
 
     $this->assertInstanceOf(
-      Core\Common\Errors\Domain::class,
+      Core\Common\Errors\Unauthorized::class,
       $maybe_session
     );
   }

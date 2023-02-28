@@ -10,7 +10,7 @@ DROP TABLE IF EXISTS sensors;
 CREATE TABLE users(
   id BINARY(36) not null,
   name varchar(128) not null,
-  created date not null,
+  created datetime not null,
   email varchar(128) unique not null,
   password varchar(128) not null,
   primary key(id)
@@ -18,14 +18,14 @@ CREATE TABLE users(
 
 CREATE TABLE accounts(
   id BINARY(36) not null,
-  created date not null,
+  created datetime not null,
   email varchar(128) unique not null,
   primary key(id)
 );
 
 CREATE TABLE confirmation_codes(
   id BINARY(36) not null,
-  created date not null,
+  created datetime not null,
   created_time INT,
   email varchar(128) unique not null,
   code SMALLINT,
@@ -35,14 +35,14 @@ CREATE TABLE confirmation_codes(
 
 CREATE TABLE roles(
   id BINARY(36) not null,
-  created date not null,
+  created datetime not null,
   name varchar(128) unique not null,
   primary key(id)
 );
 
 CREATE TABLE sensors(
   id BINARY(36) not null,
-  created date not null,
+  created datetime not null,
   name varchar(128) not null,
   longitude float not null,
   latitude float not null,

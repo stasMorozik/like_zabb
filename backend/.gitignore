@@ -22,7 +22,8 @@ vendor/
 .phpunit.result.cache
 /phpunit.xml
 
-*.env
-*.env.test
+*.env.amqp
+*.env.rest
+*.env.rest.test
 *.vstags
 ###< symfony/phpunit-bridge ###

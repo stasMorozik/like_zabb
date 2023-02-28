@@ -9,7 +9,7 @@ class DBFactory
 {
   public static function factory()
   {
-    Dotenv::createUnsafeImmutable(__DIR__ . '/../../', '.env.test')->load();
+    Dotenv::createUnsafeImmutable(__DIR__ . '/../../', '.env.rest.test')->load();
     return new MySQLAdapters\DBFactory(
       $_ENV["DB_USER"],
       $_ENV["DB_PASSWORD"],
