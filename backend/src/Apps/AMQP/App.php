@@ -2,21 +2,26 @@
 
 namespace Apps\AMQP;
 
-use Bunny;
-use PHPMailer;
+use SMTPAdapters\Notifying;
+use Core\Common\ValueObjects\Email;
+use Core\Common\Errors\InfraStructure;
+use Core\Common\Errors\Domain;
+use Bunny\Channel;
+use Bunny\Message;
+use Bunny\Client;
 
 class App
 {
-  private PHPMailer\PHPMailer\PHPMailer $mailer;
-  private Bunny\Channel $amqp_channel;
+  private Notifying $mailer;
+  private Channel $amqp_channel;
   private string $notifying_queue;
   private string $logging_queue;
   private string $smtp_user;
   private string $id_app;
 
   public function __construct(
-    PHPMailer\PHPMailer\PHPMailer $mailer,
-    Bunny\Channel $amqp_channel,
+    Notifying $mailer,
+    Channel $amqp_channel,
     string $notifying_queue,
     string $logging_queue,
     string $smtp_user,
@@ -36,30 +41,32 @@ class App
     $this->amqp_channel->publish(json_encode([
       "type" => $args["type"],
       "message" => $args["message"],
-      "date" => date("Y-m-d H:i:s")
+      "date" => date("Y-m-d H:i:s"),
+      "payload" => $args['payload']
     ]), [], "", $this->logging_queue);
   }
 
   public function send_mail_function($args): void
   {
-    $mail->setFrom($this->smtp_user, "");
-    $mail->addAddress($args["to"]);
+    $maybe_true = $this->mailer->notify(
+      $args['email'],
+      $args['subject'],
+      $args['message'],
+    );
 
-    $mail->isHTML(true);
-    $mail->Subject = $args["subject"];
-    $mail->Body = $args["message"];
-
-    try {
-      $mail->send();
-
-      $this->publish_function([
-        "type" => "info",
-        "message" => "Sent email. Queue - queue. Id application - id. Payload - {$args['to']}"
-      ]);
-    } catch (Exception $e) {
+    if ($maybe_true instanceof InfraStructure) {
       $this->publish_function([
         "type" => "warning",
-        "message" => "{$mail->ErrorInfo}. Queue - queue. Id application - id. Payload - {$args['to']}"
+        "message" => "{$maybe_true->getMessage()}. Queue - queue. Id application - {$this->id_app}. Payload - {$args['email']->getValue()}",
+        "payload" => $args['email']->getValue()
+      ]);
+    }
+
+    if ($maybe_true === true) {
+      $this->publish_function([
+        "type" => "info",
+        "message" => "Sent email. Queue - queue. Id application - {$this->id_app}. Payload - {$args['email']->getValue()}",
+        "payload" => $args['email']->getValue()
       ]);
     }
   }
@@ -69,13 +76,14 @@ class App
     $self = $this;
 
     $this->amqp_channel->run(
-      function (Bunny\Message $message, Bunny\Channel $channel, Bunny\Client $bunny) use($self) {
+      function (Message $message, Channel $channel, Client $bunny) use($self) {
         $obj = json_decode($message->{'content'});
 
         if(!is_object($obj)) {
           $self->publish_function([
             "type" => "info",
-            "message" => "Invalid json. Queue - {$_ENV['LOGGING_QUEUE']}. Id application - {$_ENV['ID_APPLICATION']}. Payload - {$message->{'content'}}"
+            "message" => "Invalid json. Queue - {$this->logging_queue}. Id application - {$this->id_app}. Payload - {$message->{'content'}}",
+            "payload" => $message->{'content'}
           ]);
         }
 
@@ -83,31 +91,33 @@ class App
           if(!isset($obj->{'email'}) || !isset($obj->{'subject'}) || !isset($obj->{'message'})) {
             $self->publish_function([
               "type" => "info",
-              "message" => "Invalid json. Queue - {$_ENV['LOGGING_QUEUE']}. Id application - {$_ENV['ID_APPLICATION']}. Payload - {$message->{'content'}}"
+              "message" => "Invalid json. Queue - {$this->logging_queue}. Id application - {$this->id_app}. Payload - {$message->{'content'}}",
+              "payload" => $message->{'content'}
             ]);
           }
 
           if (isset($obj->{'email'}) && isset($obj->{'subject'}) && isset($obj->{'message'})) {
-            $result_validation = filter_var($obj->{'email'}, FILTER_VALIDATE_EMAIL);
+            $maybe_email = Email::new(['email' => $obj->{'email'}]);
 
-            if (!$result_validation) {
+            if ($maybe_email instanceof Domain) {
               $self->publish_function([
                 "type" => "info",
-                "message" => "Invalid email address. Queue - {$_ENV['LOGGING_QUEUE']}. Id application - {$_ENV['ID_APPLICATION']}. Payload - {$message->{'content'}}"
+                "message" => "{$maybe_email->getMessage()}. Queue - {$this->logging_queue}. Id application - {$this->id_app}. Payload - {$message->{'content'}}",
+                "payload" => $message->{'content'}
               ]);
             }
 
-            if ($result_validation) {
+            if ($maybe_email instanceof Email) {
               $self->send_mail_function([
-                "to" => $obj->{"email"},
+                "email" => $maybe_email,
                 "subject" => $obj->{"subject"},
                 "message" => $obj->{"message"}
               ]);
             }
           }
-
-          $channel->ack($message);
         }
+
+        $channel->ack($message);
       },
       $this->notifying_queue
     );

@@ -10,6 +10,7 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 
 use Apps\AMQP\App;
+use SMTPAdapters\Notifying;
 
 Dotenv::createUnsafeImmutable(__DIR__.'/../../', '.env.amqp')->load();
 
@@ -20,17 +21,6 @@ $connection = [
   'password' => $_ENV["RB_PASSWORD"],
 ];
 
-$mail = new PHPMailer();
-$mail->IsSMTP();
-
-$mail->SMTPDebug = true;
-$mail->SMTPAuth = true;
-$mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
-
-$mail->Port = $_ENV["SMTP_PORT"];
-$mail->Host = $_ENV["SMTP_HOST"];
-$mail->Username = $_ENV["SMTP_USER"];
-$mail->Password = $_ENV["SMTP_PASSWORD"];
 
 $bunny = new Client($connection);
 $bunny->connect();
@@ -40,7 +30,13 @@ $channel->queueDeclare($_ENV["NOTIFYING_QUEUE"]);
 $channel->queueDeclare($_ENV["LOGGING_QUEUE"]);
 
 $app = new Apps\AMQP\App(
-  $mail,
+  new Notifying(
+    $_ENV['SMTP_HOST'],
+    (int) $_ENV['SMTP_PORT'],
+    $_ENV['SMTP_USER'],
+    $_ENV['SMTP_PASSWORD'],
+    $_ENV['SMTP_EMAIL']
+  ),
   $channel,
   $_ENV["NOTIFYING_QUEUE"],
   $_ENV["LOGGING_QUEUE"],

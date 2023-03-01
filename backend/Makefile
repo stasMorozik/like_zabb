@@ -5,7 +5,7 @@ run_db_test:
   docker run --rm --name db_zabb_test -v /projects/mysql_like_zab_test/:/var/lib/mysql_like_zab_test -e MYSQL_ROOT_PASSWORD=12345 -e MYSQL_PASSWORD=12345 -e MYSQL_USER=db_user -e MYSQL_DATABASE=zabb -e MYSQL_TCP_PORT=3307 -p 3307:3306 -d mysql:debian
 
 run_rabbit_mq:
-  docker run -d --hostname localhost --name rabbitmq_dev -e RABBITMQ_DEFAULT_USER=rabbit_user -e RABBITMQ_DEFAULT_PASS=12345 rabbitmq:3-management
+  docker run --rm -d --hostname localhost --name rabbitmq_dev -e RABBITMQ_DEFAULT_USER=rabbit_user -e RABBITMQ_DEFAULT_PASS=12345 rabbitmq:3-management
 
 build_migration:
   docker build -f Dockerfile.migration ./ -t zab_migration

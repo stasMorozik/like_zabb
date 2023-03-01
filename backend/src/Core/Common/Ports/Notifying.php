@@ -7,13 +7,14 @@ use Core;
 /**
  *
  * Creating Use Case
- *  
+ *
 **/
 
-interface Notifying 
+interface Notifying
 {
   public function notify(
     Core\Common\ValueObjects\Email $email,
+    string $subject,
     string $message
-  ): void;
+  ): Core\Common\Errors\InfraStructure | bool;
 }

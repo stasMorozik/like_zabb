@@ -4,7 +4,8 @@
   "autoload": {
     "psr-4": {
       "Core\\": "src/Core",
-      "Apps\\AMQP\\": "src/Apps/AMQP"
+      "Apps\\AMQP\\": "src/Apps/AMQP",
+      "SMTPAdapters\\": "src/SMTPAdapters"
     }
   },
   "autoload-dev": {

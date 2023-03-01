@@ -64,6 +64,7 @@ class Creating
 
     $this->_notifying_port->notify(
       $maybe_email,
+      "Confirm email address",
       "Hello! Your Code is {$maybe_code->getCode()}."
     );
 
