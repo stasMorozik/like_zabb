@@ -5,6 +5,6 @@ const config: Config.InitialOptions = {
   transform: {
   '^.+\\.ts?$': 'ts-jest',
   },
-  modulePathIgnorePatterns: ["fake-adapter"]
+  modulePathIgnorePatterns: []
 }
 export default config;
