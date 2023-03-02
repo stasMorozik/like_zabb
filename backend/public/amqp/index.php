@@ -2,7 +2,6 @@
 
 require '../../../vendor/autoload.php';
 
-use Bunny\Channel;
 use Bunny\Client;
 use Dotenv\Dotenv;
 
