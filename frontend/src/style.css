@@ -1,0 +1,49 @@
+@import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
+
+input[type="text"] {
+  border-radius: 3px;
+}
+
+input[type="text"]:hover {
+  border-color: #e2222c6b;
+}
+
+input[type="text"]:focus {
+  color: #212529;
+  background-color: #fff;
+  border-color: #dd2d36;
+  outline: 0;
+  box-shadow: none;
+}
+
+input[type="email"]:hover {
+  border-color: #e2222c6b;
+}
+
+input[type="email"] {
+  border-radius: 3px;
+}
+
+input[type="email"]:focus {
+  color: #212529;
+  background-color: #fff;
+  border-color: #dd2d36;
+  outline: 0;
+  box-shadow: none;
+}
+
+input[type="password"]:hover {
+  border-color: #e2222c6b;
+}
+
+input[type="password"] {
+  border-radius: 3px;
+}
+
+input[type="password"]:focus {
+  color: #212529;
+  background-color: #fff;
+  border-color: #dd2d36;
+  outline: 0;
+  box-shadow: none;
+}

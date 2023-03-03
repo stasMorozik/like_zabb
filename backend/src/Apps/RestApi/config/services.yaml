@@ -53,18 +53,14 @@ services:
     MySQLAdapters\Sensor\Creating:
         arguments:
 
-    SMTPAdapters\Notifying:
+    AMQPAdapters\Notifying:
         arguments:
-            $url: '%env(string:SMTP_URL)%'
-            $port: '%env(int:SMTP_PORT)%'
-            $user: '%env(int:SMTP_USER)%'
-            $password: '%env(int:SMTP_PASSWORD)%'
 
     Core\ConfirmationCode\UseCases\Creating:
         arguments:
             $creating_port: '@MySQLAdapters\ConfirmationCode\Creating'
             $getting_port: '@MySQLAdapters\ConfirmationCode\Getting'
-            $notifying_port: '@SMTPAdapters\Notifying'
+            $notifying_port: '@AMQPAdapters\Notifying'
 
     Core\ConfirmationCode\UseCases\Confirming:
         arguments:
@@ -128,32 +124,26 @@ services:
         arguments:
             $creating_use_case: '@Core\Sensor\UseCases\Creating'
 
-    Apps\RestApi\Modules\User\Controllers\BaseController:
-        calls:
-            - method: setContainer
-              arguments: ['@service_container']
+    Apps\RestApi\Modules\User\Controllers\:
+        resource: '../Modules/User/Controllers'
+        tags: ['controller.service_arguments']
 
-    Apps\RestApi\Modules\Session\Controllers\BaseController:
-        calls:
-            - method: setContainer
-              arguments: ['@service_container']
+    Apps\RestApi\Modules\Session\Controllers\:
+        resource: '../Modules/Session/Controllers'
+        tags: ['controller.service_arguments']
 
-    Apps\RestApi\Modules\Sensor\Controllers\BaseController:
-        calls:
-            - method: setContainer
-              arguments: ['@service_container']
+    Apps\RestApi\Modules\Sensor\Controllers\:
+        resource: '../Modules/Sensor/Controllers'
+        tags: ['controller.service_arguments']
 
-    Apps\RestApi\Modules\ConfirmationCode\Controllers\BaseController:
-        calls:
-            - method: setContainer
-              arguments: ['@service_container']
+    Apps\RestApi\Modules\ConfirmationCode\Controllers\:
+        resource: '../Modules/ConfirmationCode/Controllers'
+        tags: ['controller.service_arguments']
 
-    Apps\RestApi\Modules\Account\Controllers\BaseController:
-        calls:
-            - method: setContainer
-              arguments: ['@service_container']
+    Apps\RestApi\Modules\Account\Controllers\:
+        resource: '../Modules/Account/Controllers'
+        tags: ['controller.service_arguments']
 
-    Apps\RestApi\Modules\Common\Controllers\ErrorController:
-        calls:
-            - method: setContainer
-              arguments: ['@service_container']
+    Apps\RestApi\Modules\Common\Controllers\:
+        resource: '../Modules/Common/Controllers'
+        tags: ['controller.service_arguments']
