@@ -2,12 +2,8 @@
 
 require '../../../vendor/autoload.php';
 
-use Bunny\Channel;
 use Bunny\Client;
-use Bunny\Message;
 use Dotenv\Dotenv;
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\SMTP;
 
 use Apps\AMQP\App;
 use SMTPAdapters\Notifying;
