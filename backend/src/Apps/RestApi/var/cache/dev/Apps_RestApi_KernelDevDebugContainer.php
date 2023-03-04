@@ -16,6 +16,6 @@ if (!\class_exists(Apps_RestApi_KernelDevDebugContainer::class, false)) {
 
 return new \ContainerYTzH5GU\Apps_RestApi_KernelDevDebugContainer([
     'container.build_hash' => 'YTzH5GU',
-    'container.build_id' => '444fa233',
-    'container.build_time' => 1677872842,
+    'container.build_id' => '3dc86dd7',
+    'container.build_time' => 1677930408,
 ], __DIR__.\DIRECTORY_SEPARATOR.'ContainerYTzH5GU');

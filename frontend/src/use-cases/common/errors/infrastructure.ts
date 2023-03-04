@@ -18,4 +18,10 @@ export namespace Infrastructure {
       readonly message: string
     ){}
   }
+
+  export class NotFound implements Error {
+    constructor(
+      readonly message: string
+    ){}
+  }
 }

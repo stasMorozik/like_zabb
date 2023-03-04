@@ -19,8 +19,7 @@
   export default defineComponent({
     name: 'Registration',
     methods:{
-      registry(e) {
-
+      registry() {
         useCase.registry({
           name: 'test',
           email: 'test@gmail.com',

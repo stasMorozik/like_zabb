@@ -1,8 +1,9 @@
-import { Either } from "@sweet-monads/either";
+import { Either, left } from "@sweet-monads/either";
 import { ajax } from 'rxjs/ajax';
 import { map, catchError, of, Subject, Observable } from 'rxjs';
 import { Error } from "../../../use-cases/common/errors/error";
 import { Registration as RegistrationUseCase } from "../../../use-cases/user/registration";
+import { Infrastructure } from '../../../use-cases/common/errors/infrastructure';
 
 export namespace Registration {
   export class Emiter implements RegistrationUseCase.Ports.Emiter {
@@ -25,10 +26,19 @@ export namespace Registration {
         },
         body: dto
       }).pipe(
-        map(response => console.log('response: ', response)),
-        catchError(error => {
-          console.log('error: ', error);
-          return of(error);
+        catchError((error) => {
+          console.log(error);
+          //need middleware or interceptor
+          // if (error.status == 400) {
+          //   return of(left(new Infrastructure.BadRequest(error.response.message)));
+          // }
+          // if (error.status == 404) {
+          //   return of(left(new Infrastructure.NotFound(error.response.message)));
+          // }
+          // if (error.status == 500) {
+          //   return of(left(new Infrastructure.InternalServerError(error.response.message)));
+          // }
+          // return of(left(new Infrastructure.InternalServerError(error.response.message)));
         })
       );
     }
