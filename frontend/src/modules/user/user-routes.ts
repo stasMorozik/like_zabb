@@ -1,6 +1,6 @@
 const routes = [
   {
-    path: '/user/new',
+    path: '/users/new',
     component: () => import('@/modules/user/pages/Registration.vue'),
   },
 ]

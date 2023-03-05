@@ -42,6 +42,7 @@ class App
       "type" => $args["type"],
       "message" => $args["message"],
       "date" => date("Y-m-d H:i:s"),
+      "id_application" => $this->id_app,
       "payload" => $args['payload']
     ]), [], "", $this->logging_queue);
   }
@@ -57,7 +58,7 @@ class App
     if ($maybe_true instanceof InfraStructure) {
       $this->publish_function([
         "type" => "warning",
-        "message" => "{$maybe_true->getMessage()}. Queue - queue. Id application - {$this->id_app}. Payload - {$args['email']->getValue()}",
+        "message" => $maybe_true->getMessage(),
         "payload" => $args['email']->getValue()
       ]);
     }
@@ -65,7 +66,7 @@ class App
     if ($maybe_true === true) {
       $this->publish_function([
         "type" => "info",
-        "message" => "Sent email. Queue - queue. Id application - {$this->id_app}. Payload - {$args['email']->getValue()}",
+        "message" => "Sent email.",
         "payload" => $args['email']->getValue()
       ]);
     }
@@ -82,7 +83,7 @@ class App
         if(!is_object($obj)) {
           $self->publish_function([
             "type" => "info",
-            "message" => "Invalid json. Queue - {$this->logging_queue}. Id application - {$this->id_app}. Payload - {$message->{'content'}}",
+            "message" => "Invalid json.",
             "payload" => $message->{'content'}
           ]);
         }
@@ -91,7 +92,7 @@ class App
           if(!isset($obj->{'email'}) || !isset($obj->{'subject'}) || !isset($obj->{'message'})) {
             $self->publish_function([
               "type" => "info",
-              "message" => "Invalid json. Queue - {$this->logging_queue}. Id application - {$this->id_app}. Payload - {$message->{'content'}}",
+              "message" => "Invalid json.",
               "payload" => $message->{'content'}
             ]);
           }
@@ -102,7 +103,7 @@ class App
             if ($maybe_email instanceof Domain) {
               $self->publish_function([
                 "type" => "info",
-                "message" => "{$maybe_email->getMessage()}. Queue - {$this->logging_queue}. Id application - {$this->id_app}. Payload - {$message->{'content'}}",
+                "message" => $maybe_email->getMessage(),
                 "payload" => $message->{'content'}
               ]);
             }
