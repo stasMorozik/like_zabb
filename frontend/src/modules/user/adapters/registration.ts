@@ -1,23 +1,24 @@
-import { Either, left } from "@sweet-monads/either";
+import { Either, left, right } from "@sweet-monads/either";
 import { ajax } from 'rxjs/ajax';
-import { map, catchError, of, Subject, Observable } from 'rxjs';
+import { catchError, of, Subject, Observable } from 'rxjs';
 import { UseCase } from "../uses-cases/registration/use-case";
 import { Errors } from '../../common/errors';
+import { Dtos as CommonDtos } from "../../common/dtos";
 import { Dtos } from "../uses-cases/registration/dtos";
 
 export namespace Adapters {
   export class Emiter implements UseCase.Ports.Emiter {
     constructor(
-      private readonly _subject: Subject<Either<Errors.ErrorI, Dtos.SuccessRegistration>>
+      private readonly _subject: Subject<Either<Errors.ErrorI, CommonDtos.Message>>
     ){}
 
-    emit(either: Either<Errors.ErrorI, Dtos.SuccessRegistration>): void {
+    emit(either: Either<Errors.ErrorI, CommonDtos.Message>): void {
       this._subject.next(either);
     }
   }
 
   export class Api implements UseCase.Ports.Api {
-    fetch(dto: Dtos.RegistrationData): Observable<Either<Errors.ErrorI, Dtos.SuccessRegistration>> {
+    fetch(dto: Dtos.Data): Observable<Either<Errors.ErrorI, boolean>> {
       return ajax({
         url: '/api/accounts/',
         method: 'POST',
@@ -27,7 +28,6 @@ export namespace Adapters {
         body: dto
       }).pipe(
         catchError((error) => {
-          console.log(error);
           //need middleware or interceptor
           if (error.status == 400) {
             return of(left(new Errors.Infrastructure.BadRequest(error.response.message)));
@@ -38,7 +38,7 @@ export namespace Adapters {
           if (error.status == 500) {
             return of(left(new Errors.Infrastructure.InternalServerError(error.response.message)));
           }
-          return of(left(new Errors.Infrastructure.InternalServerError(error.response.message)));
+          return of(right(true));
         })
       );
     }

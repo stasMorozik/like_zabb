@@ -64,7 +64,7 @@ return function(ContainerConfigurator $containerConfigurator) {
       '%env(string:RB_VHOST)%',
       '%env(string:RB_USER)%',
       '%env(string:RB_PASSWORD)%',
-      '%env(string:LOGGING_QUEUE)%'
+      '%env(string:NOTIFYING_QUEUE)%'
     ]);
 
   $services->set(AMQPAdapters\Logger::class)
