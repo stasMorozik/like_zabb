@@ -1,25 +1,27 @@
-import { Either, left, right, ma } from "@sweet-monads/either";
-import { Dtos } from "./dtos";
+import { Either, left, right } from "@sweet-monads/either";
+import { Dtos as RegistrationDtos} from "./dtos";
+import { Dtos as CommonDtos } from "../../../common/dtos";
 import { Errors as RegistrationErrors } from './errors';
 import { Errors as CommonErrors } from '../../../common/errors';
 import { Validators as CommonValidators } from '../.././../common/validators';
 
 export namespace Validators {
 
-  export const ConfirmPassword = (dto: Dtos.Data): Either<CommonErrors.ErrorI, boolean> => {
+  export const ConfirmPassword = (dto: RegistrationDtos.Data): Either<CommonErrors.ErrorI, RegistrationDtos.Data> => {
     if (dto.confirmPassword != dto.password) {
       return left(new RegistrationErrors.Domain.PasswordNotEqual())
     }
     return right(dto);
   };
 
-  export const valid = (dto: Dtos.Data): Either<CommonErrors.ErrorI, boolean> => {
-    return CommonValidators.Name(dto).chain(
-      CommonValidators.Email
+  export const valid = (dto: RegistrationDtos.Data): Either<CommonErrors.ErrorI, RegistrationDtos.Data> => {
+    return CommonValidators.Name(dto as CommonDtos.Name).chain(
+      CommonValidators.Email.bind(undefined, dto as CommonDtos.Email)
     ).chain(
-      CommonValidators.Password
+      CommonValidators.Password.bind(undefined, dto as CommonDtos.Password)
     ).chain(
-      ConfirmPassword
+      Validators.ConfirmPassword.bind(undefined, dto as RegistrationDtos.Data)
     );
   }
+
 }

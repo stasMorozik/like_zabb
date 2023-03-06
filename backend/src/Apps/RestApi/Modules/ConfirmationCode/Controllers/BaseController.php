@@ -29,7 +29,7 @@ class BaseController extends AbstractController
 
     return $_confirming_service->confirm([
       'email' => $params->{'email'},
-      'code' => $params->{'code'}
+      'code' => (int) $params->{'code'}
     ]);
   }
 }

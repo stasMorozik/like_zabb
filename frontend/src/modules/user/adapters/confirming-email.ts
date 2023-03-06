@@ -1,10 +1,11 @@
 import { Either, left, right } from "@sweet-monads/either";
 import { ajax } from 'rxjs/ajax';
 import { catchError, of, Subject, Observable, switchMap } from 'rxjs';
-import { UseCase } from "../uses-cases/registration/use-case";
+import { UseCase } from "../uses-cases/confirming-email/use-case";
 import { Errors } from '../../common/errors';
 import { Dtos as CommonDtos } from "../../common/dtos";
-import { Dtos } from "../uses-cases/registration/dtos";
+import { Dtos } from "../uses-cases/confirming-email/dtos";
+import { Errors as CommonErrors } from "../../common/errors";
 
 export namespace Adapters {
   export class Emiter implements UseCase.Ports.Emiter {
@@ -18,10 +19,10 @@ export namespace Adapters {
   }
 
   export class Api implements UseCase.Ports.Api {
-    fetch(dto: Dtos.Data): Observable<Either<Errors.ErrorI, boolean>> {
+    fetch(dto: Dtos.Data): Observable<Either<CommonErrors.ErrorI, boolean>>  {
       return ajax({
-        url: '/api/accounts/',
-        method: 'POST',
+        url: '/api/confirmation-codes/',
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },

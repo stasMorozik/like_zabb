@@ -3,34 +3,20 @@
 import { defineComponent } from 'vue';
 import { Either } from "@sweet-monads/either";
 import { Subject } from 'rxjs';
-import { Adapters as RegistrationAdapters } from '../adapters/registration';
 import { Adapters as CreatingCodeAdapters } from '../adapters/creating-code';
-import { UseCase as RegistrationUseCase } from '../uses-cases/registration/use-case';
+import { Adapters as ConfirmingEmailAdapters } from '../adapters/confirming-email';
+import { Adapters as RegistrationAdapters } from '../adapters/registration';
 import { UseCase as CreatingCodeUseCase } from '../uses-cases/creating-code/use-case';
+import { UseCase as ConfirmingEmailUseCase } from '../uses-cases/confirming-email/use-case';
+import { UseCase as RegistrationUseCase } from '../uses-cases/registration/use-case';
 import { Dtos } from '../../common/dtos';
 import { Errors as CommonErrors } from '../../common/errors';
-
-const creatingCodeSubject = new Subject<Either<CommonErrors.ErrorI, boolean>>();
-const creatingCodeEmiter = new CreatingCodeAdapters.Emiter(creatingCodeSubject);
-const creatingCodeApi = new CreatingCodeAdapters.Api();
-const creatingCodeUseCase = new CreatingCodeUseCase.UseCase(
-  creatingCodeApi,
-  creatingCodeEmiter
-);
-
-const regSubject = new Subject<Either<CommonErrors.ErrorI, Dtos.Message>>();
-const regEmiter = new RegistrationAdapters.Emiter(regSubject);
-const regApi = new RegistrationAdapters.Api();
-const regCase = new RegistrationUseCase.UseCase(
-  regApi,
-  regEmiter
-);
 
 export default defineComponent({
   name: 'Registration',
   methods:{
     sumbitRegistrationForm() {
-      regCase.registry({
+      this._private.regUseCase.registry({
         name: this.name,
         email: this.email,
         password: this.password,
@@ -38,7 +24,13 @@ export default defineComponent({
       });
     },
     sumbitCreatingCodeForm() {
-      creatingCodeUseCase.create({email: this.email});
+      this._private.creatingCodeUseCase.create({email: this.email});
+    },
+    sumbitConfirmingEmailForm() {
+      this._private.confirmingEmailUseCase.confirm({
+        code: this.code,
+        email: this.email
+      });
     }
   },
   data() {
@@ -47,39 +39,94 @@ export default defineComponent({
       message: '',
       name: '',
       email: '',
+      code: '',
       confirmPassword: '',
       password: '',
-      state: 'creating-code'
+      state: 'creating-code',
+      _private: {
+        creatingCodeSubject: new Subject<Either<CommonErrors.ErrorI, Dtos.Message>>(),
+        confirmingEmailSubject: new Subject<Either<CommonErrors.ErrorI, Dtos.Message>>(),
+        regSubject: new Subject<Either<CommonErrors.ErrorI, Dtos.Message>>(),
+
+        creatingCodeEmiter: null,
+        creatingCodeApi: null,
+        creatingCodeUseCase: null,
+
+        confirmingEmailEmiter: null,
+        confirmingEmailApi: null,
+        confirmingEmailUseCase: null,
+
+        regEmiter: null,
+        regApi: null,
+        regUseCase: null
+      }
     }
   },
-  beforeCreate() {
-    regSubject.subscribe((x: Either<CommonErrors.ErrorI, Dtos.Message>) => {
-      x.mapLeft((e: CommonErrors.ErrorI) => {
+  beforeMount() {
+    this._private.creatingCodeSubject.subscribe((either: Either<CommonErrors.ErrorI, Dtos.Message>) => {
+      either.mapLeft((e: CommonErrors.ErrorI) => {
         this.error = true;
         this.message = e.message
       });
 
-      x.map((d: Dtos.Message) => {
+      either.map((d: Dtos.Message) => {
         this.error = false;
+        this.state = 'confirming-email'
         this.message = d.message
       });
     });
 
-    creatingCodeSubject.subscribe((x: Either<CommonErrors.ErrorI, Dtos.Message>) => {
-      x.mapLeft((e: CommonErrors.ErrorI) => {
+    this._private.confirmingEmailSubject.subscribe((either: Either<CommonErrors.ErrorI, Dtos.Message>) => {
+      either.mapLeft((e: CommonErrors.ErrorI) => {
         this.error = true;
         this.message = e.message
       });
 
-      x.map((d: Dtos.Message) => {
+      either.map((d: Dtos.Message) => {
         this.error = false;
         this.state = 'registration'
         this.message = d.message
       });
+
     });
+
+    this._private.regSubject.subscribe((either: Either<CommonErrors.ErrorI, Dtos.Message>) => {
+      either.mapLeft((e: CommonErrors.ErrorI) => {
+        this.error = true;
+        this.message = e.message
+      });
+
+      either.map((d: Dtos.Message) => {
+        this.error = false;
+        this.message = d.message
+      });
+    });
+
+    this._private.creatingCodeEmiter = new CreatingCodeAdapters.Emiter(this._private.creatingCodeSubject);
+    this._private.creatingCodeApi = new CreatingCodeAdapters.Api();
+    this._private.creatingCodeUseCase = new CreatingCodeUseCase.UseCase(
+      this._private.creatingCodeApi,
+      this._private.creatingCodeEmiter
+    );
+
+    this._private.confirmingEmailEmiter = new ConfirmingEmailAdapters.Emiter(this._private.confirmingEmailSubject);
+    this._private.confirmingEmailApi = new ConfirmingEmailAdapters.Api();
+    this._private.confirmingEmailUseCase = new ConfirmingEmailUseCase.UseCase(
+      this._private.confirmingEmailApi,
+      this._private.confirmingEmailEmiter
+    );
+
+    this._private.regEmiter = new RegistrationAdapters.Emiter(this._private.regSubject);
+    this._private.regApi = new RegistrationAdapters.Api();
+    this._private.regUseCase = new RegistrationUseCase.UseCase(
+      this._private.regApi,
+      this._private.regEmiter
+    );
   },
   beforeUnmount() {
-    //subject.unsubscribe();
+    this._private.regSubject.unsubscribe();
+    this._private.creatingCodeSubject.unsubscribe();
+    this._private.confirmingEmailSubject.unsubscribe();
   }
 });
 
@@ -88,6 +135,7 @@ export default defineComponent({
 <template>
   <div class="row justify-content-center">
     <div class="col-xxl-4 col-xl-4 col-lg-4 col-12">
+      <!-- creating confirmation code form -->
       <form v-if="state == 'creating-code'" @submit.prevent="sumbitCreatingCodeForm" class="my-5">
         <div v-if="error === true" class="alert alert-danger fw-light" role="alert">
           {{ message }}
@@ -98,16 +146,56 @@ export default defineComponent({
         <div class="mb-3">
           <label for="email" class="form-label">Email address</label>
           <input v-model="email" type="email" class="form-control" id="email" aria-describedby="emailHelp">
-          <div id="emailHelp" class="form-text">We will send confirmation code.</div>
+          <div id="emailHelp" class="form-text">We will send confirmation code to your email.</div>
         </div>
-        <button class="btn btn-danger mb-3">Ok</button>
+        <button class="btn btn-danger mb-3">Send</button>
+        <div  class="fw-light mb-2">
+          Have you received confirmation code? <a href="#" @click="state='confirming-email'" class="link-primary">Confirm</a>
+        </div>
+        <div  class="fw-light">
+          Already have confirmed email address? <a href="#" @click="state='registration'" class="link-primary">Registry</a>
+        </div>
       </form>
+      <!--  -->
+
+      <!-- confirming email form -->
+      <form v-if="state == 'confirming-email'" @submit.prevent="sumbitConfirmingEmailForm" class="my-5">
+        <div v-if="error === true" class="alert alert-danger fw-light" role="alert">
+          {{ message }}
+        </div>
+        <div v-if="error === false" class="alert alert-success fw-light" role="alert">
+          {{ message }}
+        </div>
+        <div class="mb-3">
+          <label for="email" class="form-label">Email address</label>
+          <input v-model="email" type="email" class="form-control" id="email" aria-describedby="emailHelp">
+          <div id="emailHelp" class="form-text">We will send confirmation code to your email.</div>
+        </div>
+        <div class="mb-3">
+          <label for="text" class="form-label">Confirmation code</label>
+          <input v-model="code" type="text" class="form-control" id="code" aria-describedby="codeHelp">
+          <div id="codeHelp" class="form-text">We have sent a confirmation code to your email.</div>
+        </div>
+        <button class="btn btn-danger mb-3">Confirm</button>
+        <div  class="fw-light mb-2">
+          Dont have confirmation code? <a href="#" @click="state='creating-code'" class="link-primary">Send</a>
+        </div>
+        <div  class="fw-light">
+          Already have confirmed aemail address? <a @click="state='registration'" href="#" class="link-primary">Registration</a>
+        </div>
+      </form>
+      <!--  -->
+
+      <!-- registration form -->
       <form v-if="state == 'registration'" @submit.prevent="sumbitRegistrationForm" class="my-5">
         <div v-if="error === true" class="alert alert-danger fw-light" role="alert">
           {{ message }}
         </div>
         <div v-if="error === false" class="alert alert-success fw-light" role="alert">
           {{ message }}
+        </div>
+        <div class="fw-lighter fs-5 mb-3 mt-3">
+          Before registering you have to confirm your email address
         </div>
         <div class="mb-3">
           <label for="name" class="form-label">Name</label>
@@ -129,8 +217,17 @@ export default defineComponent({
           <div id="confirmPasswordHelp" class="form-text">Re-enter password.</div>
         </div>
         <button class="btn btn-danger mb-3">Create account</button>
-        <div class="fw-light">Already have login and password? <router-link to="/user/auth/">Sign in</router-link></div>
+        <div  class="fw-light mb-2">
+          Dont have confirmation code? <a href="#" @click="state='creating-code'" class="link-primary">Send</a>
+        </div>
+        <div  class="fw-light mb-2">
+          Have you received confirmation code? <a @click="state='confirming-email'" href="#" class="link-primary">Confirm</a>
+        </div>
+        <div class="fw-light">
+          Already have login and password? <router-link class="link-primary" to="/user/auth/">Login</router-link>
+        </div>
       </form>
+      <!--  -->
     </div>
   </div>
 </template>
