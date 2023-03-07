@@ -1,28 +1,25 @@
 import { Either, left, right } from "@sweet-monads/either";
 import { ajax } from 'rxjs/ajax';
 import { catchError, of, Subject, Observable, switchMap } from 'rxjs';
-import { UseCase } from "../uses-cases/confirming-email/use-case";
-import { Errors } from '../../common/errors';
-import { Dtos as CommonDtos } from "../../common/dtos";
-import { Dtos } from "../uses-cases/confirming-email/dtos";
-import { Errors as CommonErrors } from "../../common/errors";
+import { CreatingCodeUseCase } from '../use-cases/creating-code';
+import { SharedDtos } from '../use-cases/shared/dtos';
 
-export namespace Adapters {
-  export class Emiter implements UseCase.Ports.Emiter {
+export namespace CreatingCodeAdapters {
+  export class Emiter implements CreatingCodeUseCase.Ports.Emiter {
     constructor(
-      private readonly _subject: Subject<Either<Errors.ErrorI, CommonDtos.Message>>
+      private readonly _subject: Subject<Either<Error, boolean>>
     ){}
 
-    emit(either: Either<Errors.ErrorI, CommonDtos.Message>): void {
+    emit(either: Either<Error, boolean>): void {
       this._subject.next(either);
     }
   }
 
-  export class Api implements UseCase.Ports.Api {
-    fetch(dto: Dtos.Data): Observable<Either<CommonErrors.ErrorI, boolean>>  {
+  export class Api implements CreatingCodeUseCase.Ports.Api {
+    fetch(dto: SharedDtos.Email): Observable<Either<Error, boolean>> {
       return ajax({
         url: '/api/confirmation-codes/',
-        method: 'PUT',
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },

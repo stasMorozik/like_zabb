@@ -1,4 +1,4 @@
-export namespace Dtos {
+export namespace SharedDtos {
   export type Email = {
     email: string
   }

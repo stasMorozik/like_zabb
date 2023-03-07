@@ -3,14 +3,12 @@
 import { defineComponent } from 'vue';
 import { Either } from "@sweet-monads/either";
 import { Subject } from 'rxjs';
-import { Adapters as CreatingCodeAdapters } from '../adapters/creating-code';
-import { Adapters as ConfirmingEmailAdapters } from '../adapters/confirming-email';
-import { Adapters as RegistrationAdapters } from '../adapters/registration';
-import { UseCase as CreatingCodeUseCase } from '../uses-cases/creating-code/use-case';
-import { UseCase as ConfirmingEmailUseCase } from '../uses-cases/confirming-email/use-case';
-import { UseCase as RegistrationUseCase } from '../uses-cases/registration/use-case';
-import { Dtos } from '../../common/dtos';
-import { Errors as CommonErrors } from '../../common/errors';
+import { CreatingCodeAdapters } from '../../adapters/creating-code';
+import { ConfirmingEmailAdapters } from '../../adapters/confirming-email';
+import { RegistrationAdapters } from '../../adapters/registration';
+import { CreatingCodeUseCase } from '../../use-cases/creating-code';
+import { ConfirmingEmailUseCase } from '../../use-cases/confirming-email';
+import { RegistrationUseCase } from '../../use-cases/registration';
 
 export default defineComponent({
   name: 'Registration',
@@ -20,7 +18,7 @@ export default defineComponent({
         name: this.name,
         email: this.email,
         password: this.password,
-        confirmPassword: this.confirmPassword
+        confirmingPassword: this.confirmingPassword
       });
     },
     sumbitCreatingCodeForm() {
@@ -40,13 +38,13 @@ export default defineComponent({
       name: '',
       email: '',
       code: '',
-      confirmPassword: '',
+      confirmingPassword: '',
       password: '',
       state: 'creating-code',
       _private: {
-        creatingCodeSubject: new Subject<Either<CommonErrors.ErrorI, Dtos.Message>>(),
-        confirmingEmailSubject: new Subject<Either<CommonErrors.ErrorI, Dtos.Message>>(),
-        regSubject: new Subject<Either<CommonErrors.ErrorI, Dtos.Message>>(),
+        creatingCodeSubject: new Subject<Either<Error, boolean>>(),
+        confirmingEmailSubject: new Subject<Either<Error, boolean>>(),
+        regSubject: new Subject<Either<Error, boolean>>(),
 
         creatingCodeEmiter: null,
         creatingCodeApi: null,
@@ -63,42 +61,42 @@ export default defineComponent({
     }
   },
   beforeMount() {
-    this._private.creatingCodeSubject.subscribe((either: Either<CommonErrors.ErrorI, Dtos.Message>) => {
-      either.mapLeft((e: CommonErrors.ErrorI) => {
+    this._private.creatingCodeSubject.subscribe((either: Either<Error, boolean>) => {
+      either.mapLeft((e: Error) => {
         this.error = true;
-        this.message = e.message
+        this.message = e.message;
       });
 
-      either.map((d: Dtos.Message) => {
+      either.map((d: boolean) => {
         this.error = false;
-        this.state = 'confirming-email'
-        this.message = d.message
+        this.state = 'confirming-email';
+        this.message = 'You have successfully created confirmation code';
       });
     });
 
-    this._private.confirmingEmailSubject.subscribe((either: Either<CommonErrors.ErrorI, Dtos.Message>) => {
-      either.mapLeft((e: CommonErrors.ErrorI) => {
+    this._private.confirmingEmailSubject.subscribe((either: Either<Error, boolean>) => {
+      either.mapLeft((e: Error) => {
         this.error = true;
         this.message = e.message
       });
 
-      either.map((d: Dtos.Message) => {
+      either.map((d: boolean) => {
         this.error = false;
         this.state = 'registration'
-        this.message = d.message
+        this.message = 'You have successfully confirmed email address'
       });
 
     });
 
-    this._private.regSubject.subscribe((either: Either<CommonErrors.ErrorI, Dtos.Message>) => {
-      either.mapLeft((e: CommonErrors.ErrorI) => {
+    this._private.regSubject.subscribe((either: Either<Error, boolean>) => {
+      either.mapLeft((e: Error) => {
         this.error = true;
         this.message = e.message
       });
 
-      either.map((d: Dtos.Message) => {
+      either.map((d: boolean) => {
         this.error = false;
-        this.message = d.message
+        this.message = 'You have successfully created account'
       });
     });
 
@@ -212,9 +210,9 @@ export default defineComponent({
           <div id="passwordHelp" class="form-text">Minimum length is 5 characters, maximum is 8.</div>
         </div>
         <div class="mb-3">
-          <label for="confirmPassword" class="form-label">Confirm password</label>
-          <input v-model="confirmPassword" type="password" class="form-control" id="confirmPassword" aria-describedby="confirmPasswordHelp">
-          <div id="confirmPasswordHelp" class="form-text">Re-enter password.</div>
+          <label for="confirmingPassword" class="form-label">Confirm password</label>
+          <input v-model="confirmingPassword" type="password" class="form-control" id="confirmingPassword" aria-describedby="confirmingPasswordHelp">
+          <div id="confirmingPasswordHelp" class="form-text">Re-enter password.</div>
         </div>
         <button class="btn btn-danger mb-3">Create account</button>
         <div  class="fw-light mb-2">
