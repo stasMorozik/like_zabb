@@ -7,7 +7,7 @@ const api: ConfirmingEmailUseCase.Ports.Api = {
   fetch: () => {
     return of(right(true))
   }
-};
+}
 
 test('ConfirmingEmailUseCase.Validators; Success validation data', () => {
   const either = ConfirmingEmailUseCase.Validators.valid({
@@ -16,7 +16,7 @@ test('ConfirmingEmailUseCase.Validators; Success validation data', () => {
   })
 
   expect(either.isRight()).toBe(true);
-});
+})
 
 test('ConfirmingEmailUseCase.Validators; Invalid email', () => {
   const either = ConfirmingEmailUseCase.Validators.valid({
@@ -58,3 +58,5 @@ test('ConfirmingEmailUseCase.UseCase; Success confirmation', () => {
     code: 1234
   })
 })
+
+export {}

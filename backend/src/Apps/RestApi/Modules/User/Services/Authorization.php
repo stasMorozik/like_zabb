@@ -4,59 +4,72 @@ namespace Apps\RestApi\Modules\User\Services;
 
 use Core;
 use AMQPAdapters;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Exception;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class Authorization
 {
+  private RequestStack $_request_stack;
   private Core\User\UseCases\Authorization $_authorization_use_case;
   private AMQPAdapters\Logger $_logger;
 
   public function __construct(
     Core\User\UseCases\Authorization $authorization_use_case,
-    AMQPAdapters\Logger $logger
+    AMQPAdapters\Logger $logger,
+    RequestStack $request_stack
   )
   {
     $this->_authorization_use_case = $authorization_use_case;
     $this->_logger = $logger;
+    $this->_request_stack = $request_stack;
   }
 
-  public function auth(array $args)
+  public function auth()
   {
     $resp = new JsonResponse();
 
     try {
-      $result = $this->_authorization_use_case->auth($args);
+      $session = $this->_request_stack->getSession();
+
+      $result = $this->_authorization_use_case->auth([
+        'access_token' => $session->get('access_token')
+      ]);
 
       if (($result instanceof Core\User\Entity) == false) {
         $this->_logger->info([
           'message' => $result->getMessage(),
-          'payload' => $args
+          'payload' => [
+            'access_token' => $session->get('access_token')
+          ]
         ]);
 
-        return $resp->setStatusCode(400)->setData(["message" => $result->getMessage()]);
+        return $resp->setStatusCode(401)->setData(["message" => $result->getMessage()]);
       }
 
       $this->_logger->info([
         'message' => 'Success user authorized',
-        'payload' => $args
+        'payload' => [
+          'access_token' => $session->get('access_token')
+        ]
       ]);
 
       return $resp->setStatusCode(200)->setData([
-        "id" => $result->getId(),
         "name" => $result->getName()->getValue(),
         "email" => $result->getEmail()->getValue(),
-        "created" => $result->getCreated(),
         "role" => [
-          "id" => $result->getRole()->getId(),
           "name" => $result->getRole()->getName()->getValue(),
-          "created" => $result->getRole()->getCreated()
+        ],
+        "account" => [
+          "email" => $result->getAccount()->getEmail()->getValue()
         ]
       ]);
     } catch(Exception $e) {
       $this->_logger->warn([
         'message' => $e->getMessage(),
-        'payload' => $args
+        'payload' => [
+          'access_token' => $session->get('access_token')
+        ]
       ]);
 
       return $resp->setStatusCode(500)->setData(["message" => "Something went wrong"]);

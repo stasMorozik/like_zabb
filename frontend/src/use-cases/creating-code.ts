@@ -32,8 +32,8 @@ export namespace CreatingCodeUseCase {
         this._api.fetch(dto).subscribe((e: Either<Error, boolean>) => {
           e.mapLeft((error: Error) => this._emiter.emit(left(error)))
 
-          e.map((_: boolean) => {
-            this._emiter.emit(right(true))
+          e.map((bool: boolean) => {
+            this._emiter.emit(right(bool))
           })
         })
       })

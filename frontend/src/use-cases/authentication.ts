@@ -1,10 +1,9 @@
-
 import { Observable } from "rxjs";
 import { Either, left, right } from "@sweet-monads/either";
 import { SharedDtos } from './shared/dtos';
 import { SharedValidators } from './shared/validators';
 
-export namespace ConfirmingEmailUseCase {
+export namespace AuthenticationUseCase {
   export namespace Ports {
     export interface Api {
       fetch(dto: Dtos.Data): Observable<Either<Error, boolean>>
@@ -16,25 +15,15 @@ export namespace ConfirmingEmailUseCase {
   }
 
   export namespace Dtos {
-    export type Data = SharedDtos.Email & Code
-
-    export type Code = {
-      code: number
-    }
+    export type Data = SharedDtos.Email & SharedDtos.Password
   }
 
   export namespace Validators {
-    export const Code = (dto: Dtos.Data): Either<Error, Dtos.Data> => {
-      if (dto.code > 9999 || dto.code < 1000) {
-        return left({message: 'Invalid code'} as Error)
-      }
-      return right(dto)
-    }
-
     export const valid = (dto: Dtos.Data): Either<Error, Dtos.Data> => {
-      return SharedValidators.Email(dto as SharedDtos.Email).chain(
-        Validators.Code.bind(undefined, dto as Dtos.Data)
-      )
+      return SharedValidators.Email(dto as SharedDtos.Email)
+        .chain(
+          SharedValidators.Password.bind(undefined, dto as SharedDtos.Password)
+        ) as Either<Error, Dtos.Data>
     }
   }
 
@@ -44,7 +33,7 @@ export namespace ConfirmingEmailUseCase {
       private readonly _emiter: Ports.Emiter
     ){}
 
-    confirm(dto: Dtos.Data) {
+    auth(dto: Dtos.Data) {
       const either = Validators.valid(dto)
 
       either.mapLeft((error: Error) => {

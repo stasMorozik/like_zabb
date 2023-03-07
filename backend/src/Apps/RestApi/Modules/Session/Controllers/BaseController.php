@@ -16,9 +16,7 @@ class BaseController extends AbstractController
     Request $request
   ): JsonResponse
   {
-    return $_refreshing_service->refresh([
-      'refresh_token' => isset($_SESSION["refresh_token"]) ? $_SESSION["refresh_token"] : ''
-    ]);
+    return $_refreshing_service->refresh();
   }
 
   public function quit(

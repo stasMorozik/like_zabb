@@ -29,8 +29,6 @@ class BaseController extends AbstractController
     Request $request
   ): JsonResponse
   {
-    return $_authorization_service->auth([
-      'access_token' => isset($_SESSION["access_token"]) ? $_SESSION["access_token"] : ''
-    ]);
+    return $_authorization_service->auth();
   }
 }

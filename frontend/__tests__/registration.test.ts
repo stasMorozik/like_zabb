@@ -7,7 +7,7 @@ const api: RegistrationUseCase.Ports.Api = {
   fetch: () => {
     return of(right(true))
   }
-};
+}
 
 test('RegistrationUseCase.Validators; Success validation data', () => {
   const either = RegistrationUseCase.Validators.valid({

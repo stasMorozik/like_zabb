@@ -1,5 +1,4 @@
 <script lang="ts">
-
 import { defineComponent } from 'vue';
 import { Either } from "@sweet-monads/either";
 import { Subject } from 'rxjs';
@@ -12,7 +11,7 @@ import { RegistrationUseCase } from '../../use-cases/registration';
 
 export default defineComponent({
   name: 'Registration',
-  methods:{
+  methods: {
     sumbitRegistrationForm() {
       this._private.regUseCase.registry({
         name: this.name,
@@ -21,9 +20,11 @@ export default defineComponent({
         confirmingPassword: this.confirmingPassword
       });
     },
+
     sumbitCreatingCodeForm() {
       this._private.creatingCodeUseCase.create({email: this.email});
     },
+
     sumbitConfirmingEmailForm() {
       this._private.confirmingEmailUseCase.confirm({
         code: this.code,
@@ -67,7 +68,7 @@ export default defineComponent({
         this.message = e.message
       })
 
-      either.map((d: boolean) => {
+      either.map((_: boolean) => {
         this.error = false
         this.currentForm = 'confirming-email'
         this.message = 'You have successfully created confirmation code'
@@ -80,7 +81,7 @@ export default defineComponent({
         this.message = e.message
       })
 
-      either.map((d: boolean) => {
+      either.map((_: boolean) => {
         this.error = false
         this.currentForm = 'registration'
         this.message = 'You have successfully confirmed email address'
@@ -94,7 +95,7 @@ export default defineComponent({
         this.message = e.message
       })
 
-      either.map((d: boolean) => {
+      either.map((_: boolean) => {
         this.error = false
         this.message = 'You have successfully created account'
       })
@@ -129,7 +130,6 @@ export default defineComponent({
 })
 
 </script>
-
 <template>
   <div class="row justify-content-center">
     <div class="col-xxl-4 col-xl-4 col-lg-4 col-12">
@@ -222,14 +222,13 @@ export default defineComponent({
           Have you received confirmation code? <a @click="currentForm='confirming-email'" href="#" class="link-primary">Confirm</a>
         </div>
         <div class="fw-light">
-          Already have login and password? <router-link class="link-primary" to="/user/auth/">Login</router-link>
+          Already have login and password? <router-link class="link-primary" to="/users/auth/">Login</router-link>
         </div>
       </form>
       <!--  -->
     </div>
   </div>
 </template>
-
 <style scoped>
   .btn-danger {
     background-color: #dc2c36;

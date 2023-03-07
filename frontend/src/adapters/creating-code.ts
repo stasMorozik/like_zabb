@@ -33,12 +33,15 @@ export namespace CreatingCodeAdapters {
           if (error.status == 400) {
             return of(left({message: error.response.message} as Error))
           }
+
           if (error.status == 404) {
             return of(left({message: 'Not found'} as Error))
           }
+
           if (error.status == 500) {
             return of(left({message: error.response.message} as Error))
           }
+
           return of(right(true))
         })
       )

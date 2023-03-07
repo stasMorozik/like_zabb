@@ -1,10 +1,10 @@
 import { Either, left, right } from "@sweet-monads/either";
 import { ajax } from 'rxjs/ajax';
 import { catchError, of, Subject, Observable, switchMap } from 'rxjs';
-import { RegistrationUseCase } from '../use-cases/registration';
+import { AuthenticationUseCase } from '../use-cases/authentication';
 
-export namespace RegistrationAdapters {
-  export class Emiter implements RegistrationUseCase.Ports.Emiter {
+export namespace AuthenticationAdapters {
+  export class Emiter implements AuthenticationUseCase.Ports.Emiter {
     constructor(
       private readonly _subject: Subject<Either<Error, boolean>>
     ){}
@@ -14,10 +14,10 @@ export namespace RegistrationAdapters {
     }
   }
 
-  export class Api implements RegistrationUseCase.Ports.Api {
-    fetch(dto: RegistrationUseCase.Dtos.Data): Observable<Either<Error, boolean>> {
+  export class Api implements AuthenticationUseCase.Ports.Api {
+    fetch(dto: AuthenticationUseCase.Dtos.Data): Observable<Either<Error, boolean>> {
       return ajax({
-        url: '/api/accounts/',
+        url: '/api/users/authenticate',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

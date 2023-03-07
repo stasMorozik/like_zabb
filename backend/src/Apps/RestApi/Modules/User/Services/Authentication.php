@@ -4,21 +4,25 @@ namespace Apps\RestApi\Modules\User\Services;
 
 use Core;
 use AMQPAdapters;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Exception;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class Authentication
 {
+  private RequestStack $_request_stack;
   private Core\User\UseCases\Authentication $_authentication_use_case;
   private AMQPAdapters\Logger $_logger;
 
   public function __construct(
     Core\User\UseCases\Authentication $authentication_use_case,
-    AMQPAdapters\Logger $logger
+    AMQPAdapters\Logger $logger,
+    RequestStack $request_stack
   )
   {
     $this->_authentication_use_case = $authentication_use_case;
     $this->_logger = $logger;
+    $this->_request_stack = $request_stack;
   }
 
   public function auth(array $args)
@@ -37,10 +41,10 @@ class Authentication
         return $resp->setStatusCode(400)->setData(["message" => $result->getMessage()]);
       }
 
-      session_start();
+      $session = $this->_request_stack->getSession();
 
-      $_SESSION["access_token"] = $result->getAccessToken();
-      $_SESSION["refresh_token"] = $result->getRefreshToken();
+      $session->set('access_token', $result->getAccessToken());
+      $session->set('refresh_token', $result->getRefreshToken());
 
       $this->_logger->info([
         'message' => 'Success user authenticated',

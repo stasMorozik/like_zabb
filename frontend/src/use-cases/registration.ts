@@ -32,13 +32,16 @@ export namespace RegistrationUseCase {
     }
 
     export const valid = (dto: Dtos.Data): Either<Error, Dtos.Data> => {
-      return SharedValidators.Name(dto as SharedDtos.Name).chain(
-        SharedValidators.Email.bind(undefined, dto as SharedDtos.Email)
-      ).chain(
-        SharedValidators.Password.bind(undefined, dto as SharedDtos.Password)
-      ).chain(
-        Validators.ConfirmPassword.bind(undefined, dto as Dtos.Data)
-      )
+      return SharedValidators.Name(dto as SharedDtos.Name)
+        .chain(
+          SharedValidators.Email.bind(undefined, dto as SharedDtos.Email)
+        )
+        .chain(
+          SharedValidators.Password.bind(undefined, dto as SharedDtos.Password)
+        )
+        .chain(
+          Validators.ConfirmPassword.bind(undefined, dto as Dtos.Data)
+        )
     }
   }
 
@@ -59,8 +62,8 @@ export namespace RegistrationUseCase {
         this._api.fetch(dto).subscribe((e: Either<Error, boolean>) => {
           e.mapLeft((error: Error) => this._emiter.emit(left(error)))
 
-          e.map((_: boolean) => {
-            this._emiter.emit(right(true))
+          e.map((bool: boolean) => {
+            this._emiter.emit(right(bool))
           })
         })
       })

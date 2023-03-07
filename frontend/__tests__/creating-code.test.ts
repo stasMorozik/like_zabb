@@ -7,7 +7,7 @@ const api: CreatingCodeUseCase.Ports.Api = {
   fetch: () => {
     return of(right(true))
   }
-};
+}
 
 test('CreatingCodeUseCase.UseCase; Success create code', () => {
   const subject = new Subject<Either<Error, boolean>>()
@@ -52,3 +52,5 @@ test('CreatingCodeUseCase.UseCase; Invalid email', () => {
     email: ''
   })
 })
+
+export {}
