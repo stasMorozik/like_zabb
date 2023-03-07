@@ -1,261 +1,192 @@
-import { Either, left, right } from "@sweet-monads/either";
-import { Observable, of, Subject } from "rxjs";
-import { Validators } from "../src/modules/user/uses-cases/registration/validators";
+import { Either, right } from "@sweet-monads/either";
+import { of, Subject } from "rxjs";
+import { RegistrationUseCase } from "../src/use-cases/registration";
+import { RegistrationAdapters } from '../src/adapters/registration';
 
-test('Registration.Validator; Success validation data', () => {
-  const either = Validators.valid({
+const api: RegistrationUseCase.Ports.Api = {
+  fetch: () => {
+    return of(right(true))
+  }
+};
+
+test('RegistrationUseCase.Validators; Success validation data', () => {
+  const either = RegistrationUseCase.Validators.valid({
     name: 'name',
     email: 'email@gmail.com',
     password: '12345',
-    confirmPassword: '12345'
-  });
+    confirmingPassword: '12345'
+  })
 
-  expect(either.isRight()).toBe(true);
-});
+  expect(either.isRight()).toBe(true)
+})
 
-// test('Registration.Validator; Invalid email', () => {
-//   const validator = new Registration.Validator();
+test('RegistrationUseCase.Validators; Invalid email', () => {
+  const either = RegistrationUseCase.Validators.valid({
+    name: 'name',
+    email: '',
+    password: '12345',
+    confirmingPassword: '12345'
+  })
 
-//   const maybeRight = validator.valid({
-//     name: "Test",
-//     email: "Invalid email",
-//     password: "1qw21w!",
-//     confirmPassword: "1qw21w!"
-//   });
+  expect(either.isLeft()).toBe(true)
+})
 
-//   expect(maybeRight.isLeft()).toBe(true);
-// });
+test('RegistrationUseCase.Validators; Invalid name', () => {
+  const either = RegistrationUseCase.Validators.valid({
+    name: '',
+    email: 'email@gmail.com',
+    password: '12345',
+    confirmingPassword: '12345'
+  })
 
-// test('Registration.Validator; Invalid name', () => {
-//   const validator = new Registration.Validator();
+  expect(either.isLeft()).toBe(true)
+})
 
-//   const maybeRight = validator.valid({
-//     name: "Test1",
-//     email: "test@gmail.com",
-//     password: "1qw21w!",
-//     confirmPassword: "1qw21w!"
-//   });
+test('RegistrationUseCase.Validators; Passwords are not equal', () => {
+  const either = RegistrationUseCase.Validators.valid({
+    name: 'name',
+    email: 'email@gmail.com',
+    password: '12345',
+    confirmingPassword: '123457'
+  })
 
-//   expect(maybeRight.isLeft()).toBe(true);
-// });
+  expect(either.isLeft()).toBe(true)
+})
 
-// test('Registration.Validator; Passwords are not equal', () => {
-//   const validator = new Registration.Validator();
+test('RegistrationUseCase.Validators; Invalid passwords', () => {
+  const either = RegistrationUseCase.Validators.valid({
+    name: 'name',
+    email: 'email@gmail.com',
+    password: '',
+    confirmingPassword: '123457'
+  })
 
-//   const maybeRight = validator.valid({
-//     name: "Test",
-//     email: "test@gmail.com",
-//     password: "1qw21w!",
-//     confirmPassword: "1qw21w!1"
-//   });
+  expect(either.isLeft()).toBe(true)
+})
 
-//   expect(maybeRight.isLeft()).toBe(true);
-// });
+test('RegistrationUseCase.UseCase; Success registration', () => {
+  const subject = new Subject<Either<Error, boolean>>()
 
-// const successApi: Registration.Ports.Api = {
-//   fetch: (dto: Registration.Dto): Observable<Either<Error[], Registration.Success>> => {
-//     if (dto.email == 'name@gmail.com') {
-//       return of(left<Error[], Registration.Success>([
-//         new Infrastructure.BadRequest('User already exists') as Error
-//       ]));
-//     }
-//     return of(right(new Registration.Success('Success')));
-//   }
-// }
+  const emiter = new RegistrationAdapters.Emiter(subject)
 
-// test('new Registration.UseCase', () => {
-//   const subject = new Subject<Either<Error[], Registration.Success>>();
+  const useCase = new RegistrationUseCase.UseCase(
+    api,
+    emiter
+  )
 
-//   const emiter: Registration.Ports.Emiter = {
-//     emit: (either: Either<Error[], Registration.Success>): void => {
-//       subject.next(either);
-//     }
-//   }
+  subject.subscribe({
+    next: (either: Either<Error, boolean>) => {
+      expect(either.isRight()).toBe(true);
+      subject.unsubscribe();
+    },
+  })
 
-//   const useCase = new Registration.UseCase(
-//     successApi,
-//     emiter
-//   );
-//   expect(useCase instanceof Registration.UseCase).toBe(true);
-// });
+  useCase.registry({
+    name: 'name',
+    email: 'email@gmail.com',
+    password: '12345',
+    confirmingPassword: '12345'
+  })
+})
 
-// test('Registration.UseCase; Success registration', () => {
-//   const subject = new Subject<Either<Error[], Registration.Success>>();
+test('RegistrationUseCase.UseCase; Invalid email', () => {
+  const subject = new Subject<Either<Error, boolean>>()
 
-//   const emiter: Registration.Ports.Emiter = {
-//     emit: (either: Either<Error[], Registration.Success>): void => {
-//       subject.next(either);
-//     }
-//   }
+  const emiter = new RegistrationAdapters.Emiter(subject)
 
-//   const useCase = new Registration.UseCase(
-//     successApi,
-//     emiter
-//   );
+  const useCase = new RegistrationUseCase.UseCase(
+    api,
+    emiter
+  )
 
-//   subject.subscribe({
-//     next: (e: Either<Error[], Registration.Success>) => {
-//       expect(e.value instanceof Registration.Success).toBe(true);
-//       subject.unsubscribe();
-//     },
-//   });
+  subject.subscribe({
+    next: (either: Either<Error, boolean>) => {
+      expect(either.isLeft()).toBe(true)
+      subject.unsubscribe()
+    },
+  })
 
-//   useCase.registry({
-//     name: "Test",
-//     email: "test@gmail.com",
-//     password: "1qw21w!",
-//     confirmPassword: "1qw21w!"
-//   });
-// });
+  useCase.registry({
+    name: 'name',
+    email: '',
+    password: '12345',
+    confirmingPassword: '12345'
+  })
+})
 
-// test('Registration.UseCase; Invalid email', () => {
-//   const subject = new Subject<Either<Error[], Registration.Success>>();
+test('RegistrationUseCase.UseCase; Invalid name', () => {
+  const subject = new Subject<Either<Error, boolean>>()
 
-//   const emiter: Registration.Ports.Emiter = {
-//     emit: (either: Either<Error[], Registration.Success>): void => {
-//       subject.next(either);
-//     }
-//   }
+  const emiter = new RegistrationAdapters.Emiter(subject)
 
-//   const useCase = new Registration.UseCase(
-//     successApi,
-//     emiter
-//   );
+  const useCase = new RegistrationUseCase.UseCase(
+    api,
+    emiter
+  )
 
-//   subject.subscribe({
-//     next: (e: Either<Error[], Registration.Success>) => {
-//       const err = (e.value as Error[]).pop() as Error;
-//       expect(err instanceof Domain.InvalidEmail).toBe(true);
-//       subject.unsubscribe();
-//     },
-//   });
+  subject.subscribe({
+    next: (either: Either<Error, boolean>) => {
+      expect(either.isLeft()).toBe(true)
+      subject.unsubscribe()
+    },
+  })
 
-//   useCase.registry({
-//     name: "Test",
-//     email: "test@!",
-//     password: "1qw21w!",
-//     confirmPassword: "1qw21w!"
-//   });
-// });
+  useCase.registry({
+    name: '',
+    email: 'email@gmail.com',
+    password: '12345',
+    confirmingPassword: '12345'
+  })
+})
 
-// test('Registration.UseCase; Invalid name', () => {
-//   const subject = new Subject<Either<Error[], Registration.Success>>();
+test('RegistrationUseCase.UseCase; Invalid password', () => {
+  const subject = new Subject<Either<Error, boolean>>()
 
-//   const emiter: Registration.Ports.Emiter = {
-//     emit: (either: Either<Error[], Registration.Success>): void => {
-//       subject.next(either);
-//     }
-//   }
+  const emiter = new RegistrationAdapters.Emiter(subject)
 
-//   const useCase = new Registration.UseCase(
-//     successApi,
-//     emiter
-//   );
+  const useCase = new RegistrationUseCase.UseCase(
+    api,
+    emiter
+  )
 
-//   subject.subscribe({
-//     next: (e: Either<Error[], Registration.Success>) => {
-//       const err = (e.value as Error[]).pop() as Error;
-//       expect(err instanceof Domain.InvalidName).toBe(true);
-//       subject.unsubscribe();
-//     },
-//   });
+  subject.subscribe({
+    next: (either: Either<Error, boolean>) => {
+      expect(either.isLeft()).toBe(true)
+      subject.unsubscribe()
+    },
+  })
 
-//   useCase.registry({
-//     name: "Test1",
-//     email: "test@gmail.com",
-//     password: "1qw21w!",
-//     confirmPassword: "1qw21w!"
-//   });
-// });
+  useCase.registry({
+    name: 'name',
+    email: 'email@gmail.com',
+    password: '',
+    confirmingPassword: '12345'
+  })
+})
 
-// test('Registration.UseCase; Invalid password', () => {
-//   const subject = new Subject<Either<Error[], Registration.Success>>();
+test('RegistrationUseCase.UseCase; Password are not equal', () => {
+  const subject = new Subject<Either<Error, boolean>>()
 
-//   const emiter: Registration.Ports.Emiter = {
-//     emit: (either: Either<Error[], Registration.Success>): void => {
-//       subject.next(either);
-//     }
-//   }
+  const emiter = new RegistrationAdapters.Emiter(subject)
 
-//   const useCase = new Registration.UseCase(
-//     successApi,
-//     emiter
-//   );
+  const useCase = new RegistrationUseCase.UseCase(
+    api,
+    emiter
+  )
 
-//   subject.subscribe({
-//     next: (e: Either<Error[], Registration.Success>) => {
-//       const err = (e.value as Error[]).pop() as Error;
-//       expect(err instanceof Domain.InvalidPassword).toBe(true);
-//       subject.unsubscribe();
-//     },
-//   });
+  subject.subscribe({
+    next: (either: Either<Error, boolean>) => {
+      expect(either.isLeft()).toBe(true)
+      subject.unsubscribe()
+    },
+  })
 
-//   useCase.registry({
-//     name: "Test",
-//     email: "test@gmail.com",
-//     password: "Инструменты",
-//     confirmPassword: "Инструменты"
-//   });
-// });
-
-// test('Registration.UseCase; Password not equal', () => {
-//   const subject = new Subject<Either<Error[], Registration.Success>>();
-
-//   const emiter: Registration.Ports.Emiter = {
-//     emit: (either: Either<Error[], Registration.Success>): void => {
-//       subject.next(either);
-//     }
-//   }
-
-//   const useCase = new Registration.UseCase(
-//     successApi,
-//     emiter
-//   );
-
-//   subject.subscribe({
-//     next: (e: Either<Error[], Registration.Success>) => {
-//       const err = (e.value as Error[]).pop() as Error;
-//       expect(err instanceof Registration.Errors.PasswordNotEqual).toBe(true);
-//       subject.unsubscribe();
-//     },
-//   });
-
-//   useCase.registry({
-//     name: "Test",
-//     email: "test@gmail.com",
-//     password: "1qw21w!",
-//     confirmPassword: "1q"
-//   });
-// });
-
-// test('Registration.UseCase; Bad request', () => {
-//   const subject = new Subject<Either<Error[], Registration.Success>>();
-
-//   const emiter: Registration.Ports.Emiter = {
-//     emit: (either: Either<Error[], Registration.Success>): void => {
-//       subject.next(either);
-//     }
-//   }
-
-//   const useCase = new Registration.UseCase(
-//     successApi,
-//     emiter
-//   );
-
-//   subject.subscribe({
-//     next: (e: Either<Error[], Registration.Success>) => {
-//       const err = (e.value as Error[]).pop() as Error;
-//       expect(err instanceof Infrastructure.BadRequest).toBe(true);
-//       subject.unsubscribe();
-//     },
-//   });
-
-//   useCase.registry({
-//     name: "Test",
-//     email: "name@gmail.com",
-//     password: "1qw21w!",
-//     confirmPassword: "1qw21w!"
-//   });
-// });
+  useCase.registry({
+    name: 'name',
+    email: 'email@gmail.com',
+    password: '12345',
+    confirmingPassword: '1'
+  })
+})
 
 export {}

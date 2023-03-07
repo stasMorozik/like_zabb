@@ -7,4 +7,4 @@ const routes = [
 
 export {
   routes
-};
+}

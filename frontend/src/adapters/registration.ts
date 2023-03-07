@@ -10,7 +10,7 @@ export namespace RegistrationAdapters {
     ){}
 
     emit(either: Either<Error, boolean>): void {
-      this._subject.next(either);
+      this._subject.next(either)
     }
   }
 
@@ -25,22 +25,22 @@ export namespace RegistrationAdapters {
         body: dto
       }).pipe(
         switchMap(() => {
-          return of(right(true));
+          return of(right(true))
         }),
         catchError((error) => {
           //need middleware or interceptor
           if (error.status == 400) {
-            return of(left(new Errors.Infrastructure.BadRequest(error.response.message)));
+            return of(left({message: error.response.message} as Error))
           }
           if (error.status == 404) {
-            return of(left(new Errors.Infrastructure.NotFound(error.response.message)));
+            return of(left({message: 'Not found'} as Error))
           }
           if (error.status == 500) {
-            return of(left(new Errors.Infrastructure.InternalServerError(error.response.message)));
+            return of(left({message: error.response.message} as Error))
           }
-          return of(right(true));
+          return of(right(true))
         })
-      );
+      )
     }
   }
 }

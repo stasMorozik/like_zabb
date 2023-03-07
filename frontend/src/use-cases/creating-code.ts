@@ -22,21 +22,21 @@ export namespace CreatingCodeUseCase {
     ){}
 
     create(dto: SharedDtos.Email) {
-      const either = SharedValidators.Email(dto);
+      const either = SharedValidators.Email(dto)
 
       either.mapLeft((error: Error) => {
-        this._emiter.emit(left(error));
-      });
+        this._emiter.emit(left(error))
+      })
 
       either.map(() => {
         this._api.fetch(dto).subscribe((e: Either<Error, boolean>) => {
-          e.mapLeft((error: Error) => this._emiter.emit(left(error)));
+          e.mapLeft((error: Error) => this._emiter.emit(left(error)))
 
           e.map((_: boolean) => {
-            this._emiter.emit(right(true));
-          });
-        });
-      });
+            this._emiter.emit(right(true))
+          })
+        })
+      })
     }
   }
 }

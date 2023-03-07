@@ -26,10 +26,10 @@ export namespace RegistrationUseCase {
   export namespace Validators {
     export const ConfirmPassword = (dto: Dtos.Data): Either<Error, Dtos.Data> => {
       if (dto.confirmingPassword != dto.password) {
-        return left({message: 'Password are not equal'});
+        return left({message: 'Password are not equal'} as Error)
       }
-      return right(dto);
-    };
+      return right(dto)
+    }
 
     export const valid = (dto: Dtos.Data): Either<Error, Dtos.Data> => {
       return SharedValidators.Name(dto as SharedDtos.Name).chain(
@@ -38,7 +38,7 @@ export namespace RegistrationUseCase {
         SharedValidators.Password.bind(undefined, dto as SharedDtos.Password)
       ).chain(
         Validators.ConfirmPassword.bind(undefined, dto as Dtos.Data)
-      );
+      )
     }
   }
 
@@ -49,21 +49,21 @@ export namespace RegistrationUseCase {
     ){}
 
     registry(dto: Dtos.Data) {
-      const either = Validators.valid(dto);
+      const either = Validators.valid(dto)
 
       either.mapLeft((error: Error) => {
-        this._emiter.emit(left(error));
-      });
+        this._emiter.emit(left(error))
+      })
 
       either.map(() => {
         this._api.fetch(dto).subscribe((e: Either<Error, boolean>) => {
-          e.mapLeft((error: Error) => this._emiter.emit(left(error)));
+          e.mapLeft((error: Error) => this._emiter.emit(left(error)))
 
           e.map((_: boolean) => {
-            this._emiter.emit(right(true));
-          });
-        });
-      });
+            this._emiter.emit(right(true))
+          })
+        })
+      })
     }
   }
 }
