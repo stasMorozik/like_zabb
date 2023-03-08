@@ -32,9 +32,10 @@ export namespace ConfirmingEmailUseCase {
     }
 
     export const valid = (dto: Dtos.Data): Either<Error, Dtos.Data> => {
-      return SharedValidators.Email(dto as SharedDtos.Email).chain(
-        Validators.Code.bind(undefined, dto as Dtos.Data)
-      )
+      return SharedValidators.Email(dto as SharedDtos.Email)
+        .chain(
+          Validators.Code.bind(undefined, dto as Dtos.Data)
+        )
     }
   }
 

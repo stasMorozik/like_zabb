@@ -1,7 +1,7 @@
-import { Either, left, right } from "@sweet-monads/either";
-import { ajax } from 'rxjs/ajax';
-import { catchError, of, Subject, Observable, switchMap } from 'rxjs';
+import { Either } from "@sweet-monads/either";
+import { Subject, Observable } from 'rxjs';
 import { RegistrationUseCase } from '../use-cases/registration';
+import { notAuthFetch } from './shared/not-auth.fetch';
 
 export namespace RegistrationAdapters {
   export class Emiter implements RegistrationUseCase.Ports.Emiter {
@@ -16,34 +16,11 @@ export namespace RegistrationAdapters {
 
   export class Api implements RegistrationUseCase.Ports.Api {
     fetch(dto: RegistrationUseCase.Dtos.Data): Observable<Either<Error, boolean>> {
-      return ajax({
+      return notAuthFetch<boolean>({
         url: '/api/accounts/',
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: dto
-      }).pipe(
-        switchMap(() => {
-          return of(right(true))
-        }),
-        catchError((error) => {
-          //need middleware or interceptor
-          if (error.status == 400) {
-            return of(left({message: error.response.message} as Error))
-          }
-
-          if (error.status == 404) {
-            return of(left({message: 'Not found'} as Error))
-          }
-
-          if (error.status == 500) {
-            return of(left({message: error.response.message} as Error))
-          }
-
-          return of(right(true))
-        })
-      )
+      })
     }
   }
 }

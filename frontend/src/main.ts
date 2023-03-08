@@ -1,6 +1,6 @@
 import { Either, left } from "@sweet-monads/either";
 import { Subject } from 'rxjs';
-import { createRouter, createWebHistory } from 'vue-router';
+import { createRouter, createWebHistory, Route } from 'vue-router';
 import { createApp } from 'vue';
 import './style.css';
 import App from './App.vue';
@@ -11,9 +11,9 @@ import { routes as SensorsRouter } from './ui/routes/sensors';
 import { AuthorizationAdapters } from './adapters/authorization';
 import { AuthorizationUseCase } from './use-cases/authorization';
 
-const subject = new Subject<Either<Error, AuthorizationUseCase.Dtos.User>>()
+export const authorizationSubject = new Subject<Either<Error, AuthorizationUseCase.Dtos.User>>()
 
-const authorizationEmiter = new AuthorizationAdapters.Emiter(subject)
+const authorizationEmiter = new AuthorizationAdapters.Emiter(authorizationSubject)
 const authorizationApi = new AuthorizationAdapters.Api()
 const authorizationUseCase = new AuthorizationUseCase.UseCase(
   authorizationApi,
@@ -29,35 +29,29 @@ const router = createRouter({
   ]
 })
 
-let either: Either<Error, AuthorizationUseCase.Dtos.User> = left({message: ''})
+let currentRoute: Route | null = null
 
 router.beforeEach((to, from) => {
+  currentRoute = to
   authorizationUseCase.auth()
-  console.log(either)
-  // if (either.isLeft()) {
-  //   if (to.name != 'authentication-page' && to.name != 'registration-page') {
-  //     return { name: 'authentication-page' }
-  //   }
-  // }
-
-  // if (either.isRight()) {
-  //   if (to.name == 'authentication-page') {
-  //     return { name: 'sensors' }
-  //   }
-
-  //   if (to.name == 'registration-page') {
-  //     return { name: 'sensors' }
-  //   }
-  // }
 })
 
 createApp(App).use(router).mount('#app')
 
-subject.subscribe((e: Either<Error, AuthorizationUseCase.Dtos.User>) => {
-  either = e;
-  either.mapLeft((error: Error) => {
+authorizationSubject.subscribe((either: Either<Error, AuthorizationUseCase.Dtos.User>) => {
+  either.mapLeft((_: Error) => {
+    if (currentRoute.name != 'authentication-page' && currentRoute.name != 'registration-page') {
+      router.push({name: 'authentication-page'})
+    }
   })
 
   either.map((user: AuthorizationUseCase.Dtos.User) => {
+    if (currentRoute.name == 'authentication-page') {
+      router.push({name: 'sensors'})
+    }
+
+    if (currentRoute.name == 'registration-page') {
+      router.push({name: 'sensors'})
+    }
   })
 })

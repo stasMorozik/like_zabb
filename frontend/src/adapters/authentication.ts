@@ -2,6 +2,7 @@ import { Either, left, right } from "@sweet-monads/either";
 import { ajax } from 'rxjs/ajax';
 import { catchError, of, Subject, Observable, switchMap } from 'rxjs';
 import { AuthenticationUseCase } from '../use-cases/authentication';
+import { notAuthFetch } from './shared/not-auth.fetch';
 
 export namespace AuthenticationAdapters {
   export class Emiter implements AuthenticationUseCase.Ports.Emiter {
@@ -16,34 +17,11 @@ export namespace AuthenticationAdapters {
 
   export class Api implements AuthenticationUseCase.Ports.Api {
     fetch(dto: AuthenticationUseCase.Dtos.Data): Observable<Either<Error, boolean>> {
-      return ajax({
+      return notAuthFetch<boolean>({
         url: '/api/users/authenticate',
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: dto
-      }).pipe(
-        switchMap(() => {
-          return of(right(true))
-        }),
-        catchError((error) => {
-          //need middleware or interceptor
-          if (error.status == 400) {
-            return of(left({message: error.response.message} as Error))
-          }
-
-          if (error.status == 404) {
-            return of(left({message: 'Not found'} as Error))
-          }
-
-          if (error.status == 500) {
-            return of(left({message: error.response.message} as Error))
-          }
-
-          return of(right(true))
-        })
-      )
+      })
     }
   }
 }
